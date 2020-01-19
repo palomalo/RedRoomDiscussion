@@ -23,7 +23,7 @@ from aioquic.quic.events import DatagramFrameReceived, ProtocolNegotiated, QuicE
 from aioquic.quic.logger import QuicLogger, QuicLoggerTrace
 from aioquic.tls import SessionTicket
 
-# main test params: --certificate ../tests/ssl_cert.pem --private-key ../tests/ssl_key.pem
+# main test params: --certificate ../Keys/ssl_cert.pem --private-key ../Keys/ssl_key.pem
 
 try:
     import uvloop

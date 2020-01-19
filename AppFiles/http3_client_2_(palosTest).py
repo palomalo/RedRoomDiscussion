@@ -28,10 +28,7 @@ from aioquic.quic.configuration import QuicConfiguration
 from aioquic.quic.events import QuicEvent
 from aioquic.quic.logger import QuicLogger
 
-# main test params: --ca-certs ../tests/pycacert.pem https://localhost:4433/
-# outside server test params: --print-response https://cloudflare-quic.com/
-# opening a websocket: --print-response --ca-certs ../tests/pycacert.pem wss://localhost:4433/ws
-
+# main test params: --ca-certs ../Keys/pycacert.pem https://localhost:4433/
 
 
 try:
@@ -318,8 +315,8 @@ async def run(
             ws = await client.websocket(url, subprotocols=["chat", "superchat"])
 
             # send some messages and receive reply
-            for i in range(9):
-                message = "Palos Client sagt hallo! - Count {}".format(i)
+            for i in range(2):
+                message = "Hello {}, WebSocket!".format(i)
                 print("> " + message)
                 await ws.send(message)
 
@@ -417,15 +414,7 @@ if __name__ == "__main__":
                 parallel=args.parallel,
                 print_response=args.print_response,
             )
-
-
-
-
         )
-
-
-
-
     finally:
         if configuration.quic_logger is not None:
             with open(args.quic_log, "w") as logger_fp:
