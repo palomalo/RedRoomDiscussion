@@ -1,0 +1,104 @@
+Microsoft Windows [Version 10.0.17763.914]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Users\admin>pip install aioquic
+Collecting aioquic
+  Using cached https://files.pythonhosted.org/packages/18/2d/1abe83baceb8f5c1805573520fd6ef1004362f76d0c6eef52bd871dd5c0a/aioquic-0.8.4.tar.gz
+Requirement already satisfied: cryptography>=2.5 in c:\users\admin\appdata\local\programs\python\python38\lib\site-packages (from aioquic) (2.8)
+Requirement already satisfied: pylsqpack<0.4.0,>=0.3.3 in c:\users\admin\appdata\local\programs\python\python38\lib\site-packages (from aioquic) (0.3.4)
+Requirement already satisfied: six>=1.4.1 in c:\users\admin\appdata\local\programs\python\python38\lib\site-packages (from cryptography>=2.5->aioquic) (1.13.0)
+Requirement already satisfied: cffi!=1.11.3,>=1.8 in c:\users\admin\appdata\local\programs\python\python38\lib\site-packages (from cryptography>=2.5->aioquic) (1.13.2)
+Requirement already satisfied: pycparser in c:\users\admin\appdata\local\programs\python\python38\lib\site-packages (from cffi!=1.11.3,>=1.8->cryptography>=2.5->aioquic) (2.19)
+Installing collected packages: aioquic
+    Running setup.py install for aioquic ... error
+    ERROR: Command errored out with exit status 1:
+     command: 'c:\users\admin\appdata\local\programs\python\python38\python.exe' -u -c 'import sys, setuptools, tokenize; sys.argv[0] = '"'"'C:\\Users\\admin\\AppData\\Local\\Temp\\pip-install-zyvsrlfr\\aioquic\\setup.py'"'"'; __file__='"'"'C:\\Users\\admin\\AppData\\Local\\Temp\\pip-install-zyvsrlfr\\aioquic\\setup.py'"'"';f=getattr(tokenize, '"'"'open'"'"', open)(__file__);code=f.read().replace('"'"'\r\n'"'"', '"'"'\n'"'"');f.close();exec(compile(code, __file__, '"'"'exec'"'"'))' install --record 'C:\Users\admin\AppData\Local\Temp\pip-record-iq__239n\install-record.txt' --single-version-externally-managed --compile
+         cwd: C:\Users\admin\AppData\Local\Temp\pip-install-zyvsrlfr\aioquic\
+    Complete output (85 lines):
+    running install
+    running build
+    running build_py
+    creating build
+    creating build\lib.win-amd64-3.8
+    creating build\lib.win-amd64-3.8\aioquic
+    copying src\aioquic\buffer.py -> build\lib.win-amd64-3.8\aioquic
+    copying src\aioquic\tls.py -> build\lib.win-amd64-3.8\aioquic
+    copying src\aioquic\__init__.py -> build\lib.win-amd64-3.8\aioquic
+    creating build\lib.win-amd64-3.8\aioquic\asyncio
+    copying src\aioquic\asyncio\client.py -> build\lib.win-amd64-3.8\aioquic\asyncio
+    copying src\aioquic\asyncio\compat.py -> build\lib.win-amd64-3.8\aioquic\asyncio
+    copying src\aioquic\asyncio\protocol.py -> build\lib.win-amd64-3.8\aioquic\asyncio
+    copying src\aioquic\asyncio\server.py -> build\lib.win-amd64-3.8\aioquic\asyncio
+    copying src\aioquic\asyncio\__init__.py -> build\lib.win-amd64-3.8\aioquic\asyncio
+    creating build\lib.win-amd64-3.8\aioquic\h0
+    copying src\aioquic\h0\connection.py -> build\lib.win-amd64-3.8\aioquic\h0
+    copying src\aioquic\h0\__init__.py -> build\lib.win-amd64-3.8\aioquic\h0
+    creating build\lib.win-amd64-3.8\aioquic\h3
+    copying src\aioquic\h3\connection.py -> build\lib.win-amd64-3.8\aioquic\h3
+    copying src\aioquic\h3\events.py -> build\lib.win-amd64-3.8\aioquic\h3
+    copying src\aioquic\h3\exceptions.py -> build\lib.win-amd64-3.8\aioquic\h3
+    copying src\aioquic\h3\__init__.py -> build\lib.win-amd64-3.8\aioquic\h3
+    creating build\lib.win-amd64-3.8\aioquic\quic
+    copying src\aioquic\quic\configuration.py -> build\lib.win-amd64-3.8\aioquic\quic
+    copying src\aioquic\quic\connection.py -> build\lib.win-amd64-3.8\aioquic\quic
+    copying src\aioquic\quic\crypto.py -> build\lib.win-amd64-3.8\aioquic\quic
+    copying src\aioquic\quic\events.py -> build\lib.win-amd64-3.8\aioquic\quic
+    copying src\aioquic\quic\logger.py -> build\lib.win-amd64-3.8\aioquic\quic
+    copying src\aioquic\quic\packet.py -> build\lib.win-amd64-3.8\aioquic\quic
+    copying src\aioquic\quic\packet_builder.py -> build\lib.win-amd64-3.8\aioquic\quic
+    copying src\aioquic\quic\rangeset.py -> build\lib.win-amd64-3.8\aioquic\quic
+    copying src\aioquic\quic\recovery.py -> build\lib.win-amd64-3.8\aioquic\quic
+    copying src\aioquic\quic\retry.py -> build\lib.win-amd64-3.8\aioquic\quic
+    copying src\aioquic\quic\stream.py -> build\lib.win-amd64-3.8\aioquic\quic
+    copying src\aioquic\quic\__init__.py -> build\lib.win-amd64-3.8\aioquic\quic
+    running egg_info
+    writing src\aioquic.egg-info\PKG-INFO
+    writing dependency_links to src\aioquic.egg-info\dependency_links.txt
+    writing requirements to src\aioquic.egg-info\requires.txt
+    writing top-level names to src\aioquic.egg-info\top_level.txt
+    reading manifest file 'src\aioquic.egg-info\SOURCES.txt'
+    reading manifest template 'MANIFEST.in'
+    writing manifest file 'src\aioquic.egg-info\SOURCES.txt'
+    copying src\aioquic\_buffer.c -> build\lib.win-amd64-3.8\aioquic
+    copying src\aioquic\_crypto.c -> build\lib.win-amd64-3.8\aioquic
+    running build_ext
+    building 'aioquic._buffer' extension
+    creating build\temp.win-amd64-3.8
+    creating build\temp.win-amd64-3.8\Release
+    creating build\temp.win-amd64-3.8\Release\src
+    creating build\temp.win-amd64-3.8\Release\src\aioquic
+    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.20.27508\bin\HostX86\x64\cl.exe /c /nologo /Ox /W3 /GL /DNDEBUG /MD -Ic:\users\admin\appdata\local\programs\python\python38\include -Ic:\users\admin\appdata\local\programs\python\python38\include "-IC:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.20.27508\ATLMFC\include" "-IC:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.20.27508\include" "-IC:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" "-IC:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\ucrt" "-IC:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\shared" "-IC:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\um" "-IC:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\winrt" "-IC:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\cppwinrt" /Tcsrc/aioquic/_buffer.c /Fobuild\temp.win-amd64-3.8\Release\src/aioquic/_buffer.obj
+    _buffer.c
+    src/aioquic/_buffer.c(226): warning C4244: "=": Konvertierung von "uint16_t" in "uint8_t", m”glicher Datenverlust
+    src/aioquic/_buffer.c(254): warning C4244: "=": Konvertierung von "uint64_t" in "uint8_t", m”glicher Datenverlust
+    src/aioquic/_buffer.c(255): warning C4244: "=": Konvertierung von "uint64_t" in "uint8_t", m”glicher Datenverlust
+    src/aioquic/_buffer.c(256): warning C4244: "=": Konvertierung von "uint64_t" in "uint8_t", m”glicher Datenverlust
+    src/aioquic/_buffer.c(257): warning C4244: "=": Konvertierung von "uint64_t" in "uint8_t", m”glicher Datenverlust
+    src/aioquic/_buffer.c(258): warning C4244: "=": Konvertierung von "uint64_t" in "uint8_t", m”glicher Datenverlust
+    src/aioquic/_buffer.c(259): warning C4244: "=": Konvertierung von "uint64_t" in "uint8_t", m”glicher Datenverlust
+    src/aioquic/_buffer.c(260): warning C4244: "=": Konvertierung von "uint64_t" in "uint8_t", m”glicher Datenverlust
+    src/aioquic/_buffer.c(273): warning C4244: "=": Konvertierung von "uint64_t" in "uint8_t", m”glicher Datenverlust
+    src/aioquic/_buffer.c(277): warning C4244: "=": Konvertierung von "uint64_t" in "uint8_t", m”glicher Datenverlust
+    src/aioquic/_buffer.c(278): warning C4244: "=": Konvertierung von "uint64_t" in "uint8_t", m”glicher Datenverlust
+    src/aioquic/_buffer.c(282): warning C4244: "=": Konvertierung von "uint64_t" in "uint8_t", m”glicher Datenverlust
+    src/aioquic/_buffer.c(283): warning C4244: "=": Konvertierung von "uint64_t" in "uint8_t", m”glicher Datenverlust
+    src/aioquic/_buffer.c(284): warning C4244: "=": Konvertierung von "uint64_t" in "uint8_t", m”glicher Datenverlust
+    src/aioquic/_buffer.c(285): warning C4244: "=": Konvertierung von "uint64_t" in "uint8_t", m”glicher Datenverlust
+    src/aioquic/_buffer.c(290): warning C4244: "=": Konvertierung von "uint64_t" in "uint8_t", m”glicher Datenverlust
+    src/aioquic/_buffer.c(291): warning C4244: "=": Konvertierung von "uint64_t" in "uint8_t", m”glicher Datenverlust
+    src/aioquic/_buffer.c(292): warning C4244: "=": Konvertierung von "uint64_t" in "uint8_t", m”glicher Datenverlust
+    src/aioquic/_buffer.c(293): warning C4244: "=": Konvertierung von "uint64_t" in "uint8_t", m”glicher Datenverlust
+    src/aioquic/_buffer.c(294): warning C4244: "=": Konvertierung von "uint64_t" in "uint8_t", m”glicher Datenverlust
+    src/aioquic/_buffer.c(295): warning C4244: "=": Konvertierung von "uint64_t" in "uint8_t", m”glicher Datenverlust
+    src/aioquic/_buffer.c(296): warning C4244: "=": Konvertierung von "uint64_t" in "uint8_t", m”glicher Datenverlust
+    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.20.27508\bin\HostX86\x64\link.exe /nologo /INCREMENTAL:NO /LTCG /DLL /MANIFEST:EMBED,ID=2 /MANIFESTUAC:NO /LIBPATH:c:\users\admin\appdata\local\programs\python\python38\libs /LIBPATH:c:\users\admin\appdata\local\programs\python\python38\PCbuild\amd64 "/LIBPATH:C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.20.27508\ATLMFC\lib\x64" "/LIBPATH:C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.20.27508\lib\x64" "/LIBPATH:C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\lib\um\x64" "/LIBPATH:C:\Program Files (x86)\Windows Kits\10\lib\10.0.17763.0\ucrt\x64" "/LIBPATH:C:\Program Files (x86)\Windows Kits\10\lib\10.0.17763.0\um\x64" /EXPORT:PyInit__buffer build\temp.win-amd64-3.8\Release\src/aioquic/_buffer.obj /OUT:build\lib.win-amd64-3.8\aioquic\_buffer.cp38-win_amd64.pyd /IMPLIB:build\temp.win-amd64-3.8\Release\src/aioquic\_buffer.cp38-win_amd64.lib
+       Bibliothek "build\temp.win-amd64-3.8\Release\src/aioquic\_buffer.cp38-win_amd64.lib" und Objekt "build\temp.win-amd64-3.8\Release\src/aioquic\_buffer.cp38-win_amd64.exp" werden erstellt.
+    Code wird generiert.
+    Codegenerierung ist abgeschlossen.
+    building 'aioquic._crypto' extension
+    C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.20.27508\bin\HostX86\x64\cl.exe /c /nologo /Ox /W3 /GL /DNDEBUG /MD -Ic:\users\admin\appdata\local\programs\python\python38\include -Ic:\users\admin\appdata\local\programs\python\python38\include "-IC:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.20.27508\ATLMFC\include" "-IC:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.20.27508\include" "-IC:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" "-IC:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\ucrt" "-IC:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\shared" "-IC:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\um" "-IC:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\winrt" "-IC:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\cppwinrt" /Tcsrc/aioquic/_crypto.c /Fobuild\temp.win-amd64-3.8\Release\src/aioquic/_crypto.obj
+    _crypto.c
+    src/aioquic/_crypto.c(4): fatal error C1083: Datei (Include) kann nicht ge”ffnet werden: "openssl/err.h": No such file or directory
+    error: command 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.20.27508\\bin\\HostX86\\x64\\cl.exe' failed with exit status 2
+    ----------------------------------------
+ERROR: Command errored out with exit status 1: 'c:\users\admin\appdata\local\programs\python\python38\python.exe' -u -c 'import sys, setuptools, tokenize; sys.argv[0] = '"'"'C:\\Users\\admin\\AppData\\Local\\Temp\\pip-install-zyvsrlfr\\aioquic\\setup.py'"'"'; __file__='"'"'C:\\Users\\admin\\AppData\\Local\\Temp\\pip-install-zyvsrlfr\\aioquic\\setup.py'"'"';f=getattr(tokenize, '"'"'open'"'"', open)(__file__);code=f.read().replace('"'"'\r\n'"'"', '"'"'\n'"'"');f.close();exec(compile(code, __file__, '"'"'exec'"'"'))' install --record 'C:\Users\admin\AppData\Local\Temp\pip-record-iq__239n\install-record.txt' --single-version-externally-managed --compile Check the logs for full command output.
