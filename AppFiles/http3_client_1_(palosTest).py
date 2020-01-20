@@ -6,6 +6,7 @@ import pickle
 import ssl
 import sys
 import time
+import os
 from collections import deque
 from typing import Callable, Deque, Dict, List, Optional, Union, cast
 from urllib.parse import urlparse
@@ -317,15 +318,12 @@ async def run(
         if parsed.scheme == "wss":
             ws = await client.websocket(url, subprotocols=["chat", "superchat"])
 
+            os.system('clear')
             # send some messages and receive reply
-            for i in range(9):
-                message = "Palos Client sagt hallo! - Count {}".format(i)
-                print("> " + message)
-                await ws.send(message)
-
-                message = await ws.recv()
-                print("< " + message)
-
+            message = input("Type your message: ")
+            await ws.send(message)
+            message = await ws.recv()
+            print("< " + message)
             await ws.close()
         else:
             # perform request
