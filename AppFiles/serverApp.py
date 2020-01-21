@@ -4,6 +4,7 @@
 
 import datetime
 import os
+import sqlite3
 from urllib.parse import urlencode
 
 import httpbin
@@ -88,6 +89,19 @@ async def ws(websocket):
     """
     WebSocket echo endpoint.
     """
+
+    #testing sqlite connestion
+    conn = sqlite3.connect('Database/topics.dp')
+    c = conn.cursor()
+    c.execute("SELECT * FROM topics ORDER BY ROWID ASC LIMIT 1")
+    entry = c.fetchone()
+    entry = entry[0]
+
+
+
+
+
+
     if "chat" in websocket.scope["subprotocols"]:
         subprotocol = "chat"
     else:
@@ -96,7 +110,7 @@ async def ws(websocket):
 
     try:
         while True:
-            message = await websocket.receive_text() + " (server echo)"
+            message = await websocket.receive_text() + " (server echo)" + entry
             await websocket.send_text(message)
     except WebSocketDisconnect:
         pass
