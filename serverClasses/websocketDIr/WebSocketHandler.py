@@ -2,23 +2,22 @@ import asyncio
 import time
 from collections import deque
 from email.utils import formatdate
-from typing import Callable, Deque, Dict, List, Optional, Union, cast
+from typing import Callable, Deque, Dict, Optional, Union
 
 import wsproto
 import wsproto.events
-from aioquic.h3.events import DataReceived, H3Event, HeadersReceived
+from aioquic.h3.events import DataReceived, H3Event
 
 from AppFiles.http3_server import HttpConnection
 from AppFiles.http3_server import AsgiApplication
 from AppFiles.http3_server import SERVER_NAME
 from serverClasses.HttpRequestHandler import HttpRequestHandler
-from serverClasses.QuicLoggerCustom import application
+from serverClasses.websocketDIr.QuicLoggerCustom import application
 
 
 class WebSocketHandler:
     def __init__(
             self,
-            *,
             connection: HttpConnection,
             scope: Dict,
             stream_id: int,
@@ -32,6 +31,18 @@ class WebSocketHandler:
         self.stream_id = stream_id
         self.transmit = transmit
         self.websocket: Optional[wsproto.Connection] = None
+
+        print("connection: \n")
+        print(connection)
+        print("http_event_queue: \n")
+        print("stream_id\n")
+        print(stream_id)
+        print("transmit\n")
+        print(transmit)
+        print("scope: \n")
+        print(scope)
+
+
 
     def http_event_received(self, event: H3Event) -> None:
         if isinstance(event, DataReceived) and not self.closed:
@@ -48,10 +59,17 @@ class WebSocketHandler:
     def websocket_event_received(self, event: wsproto.events.Event) -> None:
         if isinstance(event, wsproto.events.TextMessage):
             self.queue.put_nowait({"type": "websocket.receive", "text": event.data})
+            print("received msg")
+            print(event.data)
         elif isinstance(event, wsproto.events.Message):
             self.queue.put_nowait({"type": "websocket.receive", "bytes": event.data})
+            print("received msg")
+            print(event.data)
         elif isinstance(event, wsproto.events.CloseConnection):
             self.queue.put_nowait({"type": "websocket.disconnect", "code": event.code})
+            print("received msg")
+            print(event.code)
+
 
     async def run_asgi(self, app: AsgiApplication) -> None:
         self.queue.put_nowait({"type": "websocket.connect"})

@@ -4,15 +4,13 @@ import importlib
 import json
 import logging
 import os
-from aioquic.asyncio import QuicConnectionProtocol, serve
-from aioquic.h0.connection import H0_ALPN, H0Connection
-from aioquic.h3.connection import H3_ALPN, H3Connection
+from aioquic.asyncio import serve
+from aioquic.h0.connection import H0_ALPN
+from aioquic.h3.connection import H3_ALPN
 from aioquic.quic.configuration import QuicConfiguration
 from aioquic.quic.logger import QuicLogger, QuicLoggerTrace
 
-from serverClasses.SessionTicketStore import SessionTicketStore
-from serverClasses.HttpServerProtocol import HttpServerProtocol
-from AppFiles.http3_server import uvloop
+from serverClasses.websocketDIr.SessionTicketStore import SessionTicketStore
 
 
 class QuicLoggerCustom(QuicLogger):
@@ -126,15 +124,14 @@ if __name__ == "__main__":
 
     ticket_store = SessionTicketStore()
 
-    if uvloop is not None:
-        uvloop.install()
+   # if uvloop is not None:
+    #    uvloop.install()
     loop = asyncio.get_event_loop()
     loop.run_until_complete(
         serve(
             args.host,
             args.port,
             configuration=configuration,
-            create_protocol=HttpServerProtocol,
             session_ticket_fetcher=ticket_store.pop,
             session_ticket_handler=ticket_store.add,
             stateless_retry=args.stateless_retry,
