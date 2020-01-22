@@ -84,6 +84,8 @@ def padding(request):
     return PlainTextResponse("Z" * size)
 
 
+list_of_clients = []
+
 @app.websocket_route("/ws")
 async def ws(websocket):
     """
@@ -97,11 +99,11 @@ async def ws(websocket):
     #entry = c.fetchone()
     #entry = entry[0]
 
-    entry ="haha"
+    #entry ="haha"
 
 
 
-
+    #print(ws.stream_Id)
 
 
     if "chat" in websocket.scope["subprotocols"]:
@@ -110,12 +112,26 @@ async def ws(websocket):
         subprotocol = None
     await websocket.accept(subprotocol=subprotocol)
 
+    list_of_clients.append(websocket)
+    print(websocket)
+
     try:
         while True:
 
-            message = await websocket.receive_text() + " (server echo)" + entry
+
+            message = await websocket.receive_text() #+ " (server echo)" #+ entry
             print(message)
-            await websocket.send_text(message)
+            print(len(list_of_clients))
+
+            for clients in list_of_clients:
+                #try:
+                print("count")
+                await clients.send_text(message + " client")
+                #except:
+                    #await clients.close()
+                    #list_of_clients.remove(clients)
+
+            #await websocket.send_text(message)
     except WebSocketDisconnect:
         pass
 

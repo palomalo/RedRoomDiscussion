@@ -319,13 +319,15 @@ async def run(
         if parsed.scheme == "wss":
             ws = await client.websocket(url, subprotocols=["chat", "superchat"])
 
+            #print(ws.stream_id)
+
             #os.system('clear')
             # send some messages and receive reply
             #while input("Type your message: ") != "exit":
 
             while True:
-                message = input("Type your message: ")
-                await ws.send(message)
+                #message = input("Type your message: ")
+                #await ws.send(message)
                 messageRec = await ws.recv()
                 #task = [print("< " + messageRec)]
                 #await asyncio.wait(task)
