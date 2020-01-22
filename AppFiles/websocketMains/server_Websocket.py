@@ -11,6 +11,7 @@ from aioquic.quic.configuration import QuicConfiguration
 from serverClasses.websocketDIr.QuicLoggerCustom import QuicLoggerCustom
 from serverClasses.websocketDIr.SessionTicketStore import SessionTicketStore
 
+# main test params: --certificate ../../Keys/ssl_cert.pem --private-key ../../Keys/ssl_key.pem
 
 def transaction():
     print("password correct - ")

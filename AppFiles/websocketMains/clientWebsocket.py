@@ -28,12 +28,13 @@ from aioquic.quic.configuration import QuicConfiguration
 from aioquic.quic.events import QuicEvent
 from aioquic.quic.logger import QuicLogger
 
-# main test params: --ca-certs ../Keys/pycacert.pem https://localhost:4433/
 from AppFiles.websocketMains.clientClasses.URL import URL
 from AppFiles.websocketMains.clientClasses.HttpRequest import HttpRequest
 from AppFiles.websocketMains.DB.Topics import Topics
 from AppFiles.websocketMains.DB.DB_Connection import DB_Connection
 from AppFiles.websocketMains.clientClasses.HttpClient import HttpClient
+
+# opening a websocket: --print-response --ca-certs ../../Keys/pycacert.pem wss://localhost:4433/ws
 
 try:
     import uvloop
@@ -253,6 +254,12 @@ def getuserinput():
     userInput = ""
     userinput = ""
     print("Start")
+
+    #TODO: Das Kennwort darf nie auf Client-Seite gespeichert sein.
+    # der Client verbindet sich im ersten Schrit über Websocket mit
+    # dem Server und dann (wenn connection möglich war) wird der user
+    # zur Eingabe von Login-Daten aufgefordert, diese werden dem Server
+    # als bspw JSON geschickt mit den dort verzeichneten Login-Daten abgeglichen
     while "pw1234" not in userInput:
         userInput = input("to start a connection type in password")
         userInput = userInput.lower()
@@ -265,6 +272,13 @@ def getuserinput():
 
     userTopicInput = ""
     userNewTopicInput = ""
+
+    #TODO - Der client verbindet sich gar nicht mit der DB und hat auch
+    # keinen Zugriff auf diese (SQLite als eine Serverless-DB kann nach
+    # Deployment sowieso nur über die ServerApp erreicht werden, weil sie
+    # keine eigenständige run environment hat)
+    # Der Client fragt alles über den Server ab, von dem er über QUIC bspw.
+    # JSON bekommt - siehe Laufzeitsicht
     db = DB_Connection()
     boolVar = None
     boolVar = True
