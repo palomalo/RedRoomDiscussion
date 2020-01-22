@@ -84,6 +84,8 @@ def transaction():
 
         # import ASGI application
         module_str, attr_str = args.app.split(":", maxsplit=1)
+        print(attr_str)
+        print(module_str)
         module = importlib.import_module(module_str)
         application = getattr(module, attr_str)
 

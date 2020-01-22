@@ -4,6 +4,8 @@
 
 import datetime
 import os
+import psutil
+import sqlite3
 from urllib.parse import urlencode
 
 import httpbin
@@ -15,10 +17,10 @@ from starlette.templating import Jinja2Templates
 from starlette.websockets import WebSocketDisconnect
 
 ROOT = os.path.dirname(__file__)
-LOGS_PATH = os.path.join(ROOT, "htdocs", "logs")
+LOGS_PATH = os.path.join(ROOT, "../htdocs", "logs")
 QVIS_URL = "https://qvis.edm.uhasselt.be/"
 
-templates = Jinja2Templates(directory=os.path.join(ROOT, "templates"))
+templates = Jinja2Templates(directory=os.path.join(ROOT, "../templates"))
 app = Starlette()
 
 
@@ -40,7 +42,6 @@ async def echo(request):
     media_type = request.headers.get("content-type")
     return Response(content, media_type=media_type)
 
-
 @app.route("/logs/?")
 async def logs(request):
     """
@@ -59,9 +60,9 @@ async def logs(request):
                     "file_url": file_url,
                     "name": name[:-5],
                     "qvis_url": QVIS_URL
-                    + "?"
-                    + urlencode({"file": file_url})
-                    + "#/sequence",
+                                + "?"
+                                + urlencode({"file": file_url})
+                                + "#/sequence",
                     "size": s.st_size,
                 }
             )
@@ -88,6 +89,7 @@ async def ws(websocket):
     """
     WebSocket echo endpoint.
     """
+
     if "chat" in websocket.scope["subprotocols"]:
         subprotocol = "chat"
     else:
@@ -96,7 +98,7 @@ async def ws(websocket):
 
     try:
         while True:
-            message = await websocket.receive_text() + " (server echo)"
+            message = await websocket.receive_text() + " (server echo)" + entry
             await websocket.send_text(message)
     except WebSocketDisconnect:
         pass

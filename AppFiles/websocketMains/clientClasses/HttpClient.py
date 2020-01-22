@@ -1,4 +1,3 @@
-'''
 import argparse
 import asyncio
 import json
@@ -29,16 +28,15 @@ from aioquic.quic.configuration import QuicConfiguration
 from aioquic.quic.events import QuicEvent
 from aioquic.quic.logger import QuicLogger
 
-# main test params: --ca-certs ../Keys/pycacert.pem https://localhost:4433/
-from AppFiles.websocketMains.clientClasses.URL import URL
-from AppFiles.websocketMains.clientClasses.HttpRequest import HttpRequest
-from AppFiles.websocketMains.clientClasses.WebSocket import WebSocket
 
 from AppFiles.websocketMains.clientClasses.HttpConnection import HttpConnection
-from AppFiles.websocketMains.clientClasses.URL import URL
 from AppFiles.websocketMains.clientClasses.WebSocket import WebSocket
+from AppFiles.websocketMains.clientClasses.HttpRequest import HttpRequest
+from AppFiles.websocketMains.clientClasses.URL import URL
+
 
 USER_AGENT = "aioquic/" + aioquic.__version__
+URLLL = URL("wss://localhost:4433/ws")
 
 
 class HttpClient(QuicConnectionProtocol):
@@ -69,14 +67,14 @@ class HttpClient(QuicConnectionProtocol):
         Perform a POST request.
         """
         return await self._request(
-            HttpRequest(method="POST", url=URL, content=data, headers=headers)
+            HttpRequest(method="POST", url=URLLL, content=data, headers=headers)
         )
 
     async def websocket(self, url: str, subprotocols: List[str] = []) -> WebSocket:
         """
         Open a WebSocket.
         """
-        request = HttpRequest(method="CONNECT", url=URL)
+        request = HttpRequest(method="CONNECT", url=URLLL)
         stream_id = self._quic.get_next_available_stream_id()
         websocket = WebSocket(
             http=self._http, stream_id=stream_id, transmit=self.transmit
@@ -152,4 +150,4 @@ class HttpClient(QuicConnectionProtocol):
         self._request_waiter[stream_id] = waiter
         self.transmit()
 
-        return await asyncio.shield(waiter)'''
+        return await asyncio.shield(waiter)
