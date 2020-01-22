@@ -1,0 +1,14 @@
+[
+  {
+    "topic": "interestings topic 1", "messages": [
+    {"dateTime": "2020-01-20 10:00", "sender": "Palo", "message": "Hello"},
+    {"dateTime": "2020-01-20 11:00", "sender": "Palo", "message": "How are you?"}
+  ]
+  },
+  {
+    "topic": "interestings topic 2", "messages": [
+    {"dateTime": "2020-01-21 10:00", "sender": "Bernhard", "message": "Hello"},
+    {"dateTime": "2020-01-21 11:00", "sender": "Palo", "message": "How are you?"}
+  ]
+  }
+]
