@@ -10,5 +10,4 @@ class URL:
         if parsed.query:
             self.full_path += "?" + parsed.query
         self.scheme = parsed.scheme
-        print("Method1 url")
-        print(url)
+        print("print url: "+url)

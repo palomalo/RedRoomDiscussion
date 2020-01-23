@@ -47,7 +47,8 @@ HttpConnection = Union[H0Connection, H3Connection]
 
 USER_AGENT = "aioquic/" + aioquic.__version__
 
-URLLL = URL("wss://localhost:4433/ws")
+
+# URLLL = URL("wss://localhost:4433/ws")
 
 
 # websocket = WebSocket() 3 required arguments
@@ -58,10 +59,6 @@ def getUserAgent():
 
 
 def transaction(userChat):
-    print("password correct - ")
-    print("run client")
-    print(userChat)
-
     async def perform_http_request(
             client: HttpClient, url: str, data: str, print_response: bool
     ) -> None:
@@ -143,15 +140,10 @@ def transaction(userChat):
             if parsed.scheme == "wss":
                 ws = await client.websocket(url, subprotocols=["chat", "superchat"])
 
-                # send some messages and receive reply
-                for i in range(2):
-                    message = "Hello {}, WebSocket!".format(i)
-                    message = userChat
-                    print("> " + message)
-                    await ws.send(message)
-
-                    message = await ws.recv()
-                    print("< " + message)
+                print("> " + userChat)
+                await ws.send(userChat)
+                message = await ws.recv()
+                print("< " + message)
 
                 await ws.close()
             else:
@@ -253,13 +245,7 @@ def transaction(userChat):
 def getuserinput():
     userInput = ""
     userinput = ""
-    print("Start")
 
-    #TODO: Das Kennwort darf nie auf Client-Seite gespeichert sein.
-    # der Client verbindet sich im ersten Schrit über Websocket mit
-    # dem Server und dann (wenn connection möglich war) wird der user
-    # zur Eingabe von Login-Daten aufgefordert, diese werden dem Server
-    # als bspw JSON geschickt mit den dort verzeichneten Login-Daten abgeglichen
     while "pw1234" not in userInput:
         userInput = input("to start a connection type in password")
         userInput = userInput.lower()
@@ -267,49 +253,16 @@ def getuserinput():
             print("password not valid: try again or type 'exit' to close window")
         if "exit" in userInput:
             print("Good bye")
-
     print("password correct")
-
     userTopicInput = ""
-    userNewTopicInput = ""
-
-    #TODO - Der client verbindet sich gar nicht mit der DB und hat auch
-    # keinen Zugriff auf diese (SQLite als eine Serverless-DB kann nach
-    # Deployment sowieso nur über die ServerApp erreicht werden, weil sie
-    # keine eigenständige run environment hat)
-    # Der Client fragt alles über den Server ab, von dem er über QUIC bspw.
-    # JSON bekommt - siehe Laufzeitsicht
-    db = DB_Connection()
-    boolVar = None
-    boolVar = True
-
-    while boolVar:
-        userTopicInput = input("ADD / GET TOPICS")
+    while "get topics" and "get" not in userTopicInput:
+        userTopicInput = input("type 'get topics' to get all TOPICS or type exit")
         userTopicInput = userTopicInput.lower()
-        if "ADD" not in userTopicInput and "GET" not in userTopicInput:
-            print("either ADD or GET Allowed nothing else!")
         if "get" in userTopicInput:
-            boolVar = False
-            print("available topics")
-            print(db.getAllTopics())
-        if "add" in userTopicInput:
-            boolVar = False
-            userNewTopicInput = input("type new topic name")
-            userNewTopicInput = userNewTopicInput.lower()
-            userChat = input("startChat")
-            userChat = userChat.lower()
-
-            db.insert_topic(userNewTopicInput, userChat)
-            print(db.getAllTopics())
-            transaction(userChat)
-
+            transaction("client sent 'get topics'")
         if "exit" in userTopicInput:
             boolVar = False
             print("Good bye")
-
-    # while "exit" not in userinput:
-
-
 
 
 # Main program

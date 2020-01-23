@@ -1,7 +1,3 @@
-#
-# demo application for http3_server.py
-#
-
 import datetime
 import os
 import sqlite3
@@ -15,11 +11,15 @@ from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 from starlette.websockets import WebSocketDisconnect
 
+from AppFiles.websocketMains.DB.DB_Connection import DB_Connection
+
 ROOT = os.path.dirname(__file__)
-LOGS_PATH = os.path.join(ROOT, "htdocs", "logs")
+print(ROOT)
+
+LOGS_PATH = os.path.join(ROOT, "../htdocs", "logs")
 QVIS_URL = "https://qvis.edm.uhasselt.be/"
 
-templates = Jinja2Templates(directory=os.path.join(ROOT, "templates"))
+templates = Jinja2Templates(directory=os.path.join(ROOT, "../templates"))
 app = Starlette()
 
 
@@ -60,9 +60,9 @@ async def logs(request):
                     "file_url": file_url,
                     "name": name[:-5],
                     "qvis_url": QVIS_URL
-                    + "?"
-                    + urlencode({"file": file_url})
-                    + "#/sequence",
+                                + "?"
+                                + urlencode({"file": file_url})
+                                + "#/sequence",
                     "size": s.st_size,
                 }
             )
@@ -86,21 +86,17 @@ def padding(request):
 
 @app.websocket_route("/ws")
 async def ws(websocket):
+    print("drinn")
     """
     WebSocket echo endpoint.
     """
 
-    #testing sqlite connestion
-    conn = sqlite3.connect('Database/topics.dp')
-    c = conn.cursor()
-    c.execute("SELECT * FROM topics ORDER BY ROWID ASC LIMIT 1")
-    entry = c.fetchone()
+    db = DB_Connection()
+
+    entry = db.getAllTopics()
     entry = entry[0]
 
-
-
-
-
+    print("ss3")
 
     if "chat" in websocket.scope["subprotocols"]:
         subprotocol = "chat"
@@ -113,9 +109,11 @@ async def ws(websocket):
             message = await websocket.receive_text() + " (server echo)" + entry
             await websocket.send_text(message)
     except WebSocketDisconnect:
-        pass
+        await websocket.send_text("ws disconnect")
 
+
+print("drinnen")
 
 app.mount("/httpbin", WsgiToAsgi(httpbin.app))
 
-app.mount("/", StaticFiles(directory=os.path.join(ROOT, "htdocs"), html=True))
+app.mount("/", StaticFiles(directory=os.path.join(ROOT, "../htdocs"), html=True))

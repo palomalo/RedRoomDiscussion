@@ -36,9 +36,6 @@ from AppFiles.websocketMains.clientClasses.URL import URL
 
 
 USER_AGENT = "aioquic/" + aioquic.__version__
-URLLL = URL("wss://localhost:4433/ws")
-
-
 class HttpClient(QuicConnectionProtocol):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -67,14 +64,14 @@ class HttpClient(QuicConnectionProtocol):
         Perform a POST request.
         """
         return await self._request(
-            HttpRequest(method="POST", url=URLLL, content=data, headers=headers)
+            HttpRequest(method="POST", url=URL(url), content=data, headers=headers)
         )
 
     async def websocket(self, url: str, subprotocols: List[str] = []) -> WebSocket:
         """
         Open a WebSocket.
         """
-        request = HttpRequest(method="CONNECT", url=URLLL)
+        request = HttpRequest(method="CONNECT", url=URL(url))
         stream_id = self._quic.get_next_available_stream_id()
         websocket = WebSocket(
             http=self._http, stream_id=stream_id, transmit=self.transmit
@@ -125,7 +122,7 @@ class HttpClient(QuicConnectionProtocol):
             self.pushes[event.push_id].append(event)
 
     def quic_event_received(self, event: QuicEvent):
-        #  pass event to the HTTP layer
+        #  pass event to the HTTP layer
         if self._http is not None:
             for http_event in self._http.handle_event(event):
                 self.http_event_received(http_event)
@@ -135,13 +132,13 @@ class HttpClient(QuicConnectionProtocol):
         self._http.send_headers(
             stream_id=stream_id,
             headers=[
-                        (b":method", request.method.encode()),
-                        (b":scheme", request.url.scheme.encode()),
-                        (b":authority", request.url.authority.encode()),
-                        (b":path", request.url.full_path.encode()),
-                        (b"user-agent", USER_AGENT.encode()),
-                    ]
-                    + [(k.encode(), v.encode()) for (k, v) in request.headers.items()],
+                (b":method", request.method.encode()),
+                (b":scheme", request.url.scheme.encode()),
+                (b":authority", request.url.authority.encode()),
+                (b":path", request.url.full_path.encode()),
+                (b"user-agent", USER_AGENT.encode()),
+            ]
+            + [(k.encode(), v.encode()) for (k, v) in request.headers.items()],
         )
         self._http.send_data(stream_id=stream_id, data=request.content, end_stream=True)
 
