@@ -5,6 +5,7 @@
 import datetime
 import os
 import sqlite3
+import json
 from urllib.parse import urlencode
 
 import httpbin
@@ -14,6 +15,8 @@ from starlette.responses import PlainTextResponse, Response
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 from starlette.websockets import WebSocketDisconnect
+
+from AppFiles.websocketMains.DB.DB_Connection import DB_Connection
 
 ROOT = os.path.dirname(__file__)
 LOGS_PATH = os.path.join(ROOT, "htdocs", "logs")
@@ -60,9 +63,9 @@ async def logs(request):
                     "file_url": file_url,
                     "name": name[:-5],
                     "qvis_url": QVIS_URL
-                    + "?"
-                    + urlencode({"file": file_url})
-                    + "#/sequence",
+                                + "?"
+                                + urlencode({"file": file_url})
+                                + "#/sequence",
                     "size": s.st_size,
                 }
             )
@@ -84,23 +87,29 @@ def padding(request):
     return PlainTextResponse("Z" * size)
 
 
+# *** Multi connection server ***
+# Array to store socket references
+# of all established connections
+list_of_clients = []
+
 @app.websocket_route("/ws")
 async def ws(websocket):
     """
     WebSocket echo endpoint.
     """
 
-    #testing sqlite connestion
-    conn = sqlite3.connect('Database/topics.dp')
-    c = conn.cursor()
-    c.execute("SELECT * FROM topics ORDER BY ROWID ASC LIMIT 1")
-    entry = c.fetchone()
-    entry = entry[0]
+    # c.execute("""CREATE TABLE IF NOT EXISTS topics (
+    #           topicName text,
+    #            text text
+    #            )""")
 
+    #db = DB_Connection()
 
+    #entry = json.dumps(db.getAllTopics())
+    #print(entry)
 
-
-
+    #results = db.getAllTopics()
+    # entry[0]
 
     if "chat" in websocket.scope["subprotocols"]:
         subprotocol = "chat"
@@ -108,14 +117,35 @@ async def ws(websocket):
         subprotocol = None
     await websocket.accept(subprotocol=subprotocol)
 
+    # *** Multi connection server ***
+    # add to array of socket references
+    list_of_clients.append(websocket)
+    print(websocket)
+
     try:
         while True:
-            message = await websocket.receive_text() + " (server echo)" + entry
-            await websocket.send_text(message)
+            message = await websocket.receive_text()
+            print("Received from " + message)
+            # await websocket.send_text(message)
+            # await websocket.send(message)
+
+            #TODO: Login und Themenauswahl müssen vom Messaging
+            # gesondert behandelt werden, weil messages an alle
+            # aktive Clients weitergegeben werden.
+            #if type(message) == str:
+                #await websocket.send_json(results)
+
+            for clients in list_of_clients:
+                try:
+                    await clients.send_text(message + " client")
+                except:
+                    await clients.close()
+                    list_of_clients.remove(clients)
+
     except WebSocketDisconnect:
         pass
 
 
 app.mount("/httpbin", WsgiToAsgi(httpbin.app))
 
-app.mount("/", StaticFiles(directory=os.path.join(ROOT, "htdocs"), html=True))
+app.mount("/", StaticFiles(directory=os.path.join(ROOT, "../htdocs"), html=True))
