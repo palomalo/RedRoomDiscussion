@@ -10,4 +10,3 @@ class HttpRequest:
         self.headers = headers
         self.method = method
         self.url = url
-        print("Method2 url")

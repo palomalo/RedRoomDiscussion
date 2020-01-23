@@ -28,7 +28,6 @@ class WebSocket:
 
         print("websocket httpconnection")
         print(http)
-        print(http.__str__())
 
     async def close(self, code=1000, reason="") -> None:
         """
@@ -56,6 +55,7 @@ class WebSocket:
         self.http.send_data(stream_id=self.stream_id, data=data, end_stream=False)
         self.transmit()
 
+
     def http_event_received(self, event: H3Event):
         if isinstance(event, HeadersReceived):
             for header, value in event.headers:
@@ -66,7 +66,10 @@ class WebSocket:
 
         for ws_event in self.websocket.events():
             self.websocket_event_received(ws_event)
+        #print("http_event_received")
 
     def websocket_event_received(self, event: wsproto.events.Event) -> None:
         if isinstance(event, wsproto.events.TextMessage):
             self.queue.put_nowait(event.data)
+            #print(event.data)
+            #print("ws_event_received")

@@ -4,8 +4,8 @@
 
 import datetime
 import os
-import psutil
 import sqlite3
+import json
 from urllib.parse import urlencode
 
 import httpbin
@@ -16,11 +16,13 @@ from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 from starlette.websockets import WebSocketDisconnect
 
+from AppFiles.websocketMains.DB.DB_Connection import DB_Connection
+
 ROOT = os.path.dirname(__file__)
-LOGS_PATH = os.path.join(ROOT, "../htdocs", "logs")
+LOGS_PATH = os.path.join(ROOT, "htdocs", "logs")
 QVIS_URL = "https://qvis.edm.uhasselt.be/"
 
-templates = Jinja2Templates(directory=os.path.join(ROOT, "../templates"))
+templates = Jinja2Templates(directory=os.path.join(ROOT, "templates"))
 app = Starlette()
 
 
@@ -41,6 +43,7 @@ async def echo(request):
     content = await request.body()
     media_type = request.headers.get("content-type")
     return Response(content, media_type=media_type)
+
 
 @app.route("/logs/?")
 async def logs(request):
@@ -90,6 +93,19 @@ async def ws(websocket):
     WebSocket echo endpoint.
     """
 
+    # c.execute("""CREATE TABLE IF NOT EXISTS topics (
+    #           topicName text,
+    #            text text
+    #            )""")
+
+    db = DB_Connection()
+
+    #entry = json.dumps(db.getAllTopics())
+    #print(entry)
+
+    results = db.getAllTopics()
+    # entry[0]
+
     if "chat" in websocket.scope["subprotocols"]:
         subprotocol = "chat"
     else:
@@ -98,8 +114,12 @@ async def ws(websocket):
 
     try:
         while True:
-            message = await websocket.receive_text() + " (server echo)" + entry
-            await websocket.send_text(message)
+            message = await websocket.receive_text()
+            # await websocket.send_text(message)
+            # await websocket.send(message)
+            if type(message) == str:
+                await websocket.send_json(results)
+
     except WebSocketDisconnect:
         pass
 

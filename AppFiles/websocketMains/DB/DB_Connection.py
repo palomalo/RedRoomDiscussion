@@ -1,54 +1,81 @@
 import sqlite3
-from AppFiles.websocketMains.DB.Topics import Topics
 
-conn = sqlite3.connect('topics.db')
-c = conn.cursor()
 
-c.execute("""CREATE TABLE IF NOT EXISTS topics (
-            topicName text,
-            text text
-            )""")
+# conn = sqlite3.connect('topics_new1.db')
+# c = conn.cursor()
 
 
 class DB_Connection:
 
-    def insert_topic(self, topicName, text):
-        with conn:
-            c.execute("INSERT INTO topics VALUES (:topicName, :text)", {'topicName': topicName, 'text': text})
+    def getConnection(self):
+        def dict_factory(cursor, row):
+            d = {}
+            for idx, col in enumerate(cursor.description):
+                d[col[0]] = row[idx]
+            return d
+        conn = sqlite3.connect('topics_new1.db')
+        conn.row_factory = dict_factory
+        return conn
 
-    def get_topics_by_name(self, topicName):
-        c.execute("SELECT * FROM topics WHERE topicName=:topicName", {'topicName': topicName})
-        return c.fetchall()
+    def getCursor(self, conn):
+        return conn.cursor
+
+    def insert_topic(self, idTopic, topicName, text):
+        with self.getConnection:
+            self.getCursor(self.getConnection()).execute("INSERT INTO topics_new1 VALUES (:id, :topicName, :text)",
+                                                         {'id': idTopic, 'topicName': topicName, 'text': text})
+
+
+
+    # def get_topics_new1_by_name(self, topicName):
+    #   c.execute("SELECT * FROM topics_new1 WHERE topicName=:topicName", {'topicName': topicName})
+    #  print(c.fetchall())
+    # return c.fetchall()
+
+    def dict_factory(cursor, row):
+        d = {}
+        for idx, col in enumerate(cursor.description):
+            d[col[0]] = row[idx]
+        return d
 
     def getAllTopics(self):
-        c.execute("SELECT * FROM topics")
-        return c.fetchall()
+        def dict_factory(cursor, row):
+            d = {}
+            for idx, col in enumerate(cursor.description):
+                d[col[0]] = row[idx]
+            return d
+        connection = sqlite3.connect("topics_new1.db")
+        connection.row_factory = dict_factory
+        cursor = connection.cursor()
+        cursor.execute("select * from topics_new1")
+        return cursor.fetchall()
 
-    def update_text(emp, text):
-        with conn:
-            c.execute("""UPDATE topics SET text = :text
-                        WHERE topicName = :topicName """,
-                      {'topicName': emp.topicName, 'text': emp.text})
+# def update_text(emp, text):
+#  with conn:
+#  c.execute("""UPDATE topics_new1 SET text = :text
+#      WHERE topicName = :topicName """,
+#    {'topicName': emp.topicName, 'text': emp.text})
 
-    def remove_emp(self, topicName,text):
-        with conn:
-            c.execute("DELETE from topics WHERE topicName = :topicName AND text = :text",
-                      {'topicName': topicName, 'text': text})
+# def remove_emp(self, topicName, text):
+# with conn:
+#   c.execute("DELETE from topics_new1 WHERE topicName = :topicName AND text = :text",
+#  {'topicName': topicName, 'text': text})
 
-#  top1 = Topics('topic1', 'bspTExt')
-# top2 = Topics('topic2', 'bsptext2')
+
+# my_query = query_db("select * from majorroadstiger limit %s", (3,))
+
+#  top1 = topics_new1('topic1', 'bspTExt')
+# top2 = topics_new1('topic2', 'bsptext2')
 
 # insert_topic(top1)
 # insert_topic(top2)
 
-# allTops = DbgetAllTopics()
-
-# topics = get_topics_by_name('topic1')
-#  print(topics)
+# topics_new1 = get_topics_new1_by_name('topic1')
+#  print(topics_new1)
 
 # update_text(top2, "newTopic")
 # remove_emp(top1)
 
-# tops = get_topics_by_name('topic2')
+# tops = get_topics_new1_by_name('topic2')
 # print(tops)
 # print(allTops)
