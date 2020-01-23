@@ -3,9 +3,10 @@ import sqlite3
 
 # conn = sqlite3.connect('topics_new1.db')
 # c = conn.cursor()
+from itertools import chain
 
 
-class DB_Connection:
+class Topics:
 
     def getConnection(self):
         def dict_factory(cursor, row):
@@ -20,10 +21,10 @@ class DB_Connection:
     def getCursor(self, conn):
         return conn.cursor
 
-    def insert_topic(self, idTopic, topicName, text):
+    def insert_topic(self, topicName, text):
         with self.getConnection:
-            self.getCursor(self.getConnection()).execute("INSERT INTO topics_new1 VALUES (:id, :topicName, :text)",
-                                                         {'id': idTopic, 'topicName': topicName, 'text': text})
+            self.getCursor(self.getConnection()).execute("INSERT INTO topics_new1 VALUES (:topicName, :text)",
+                                                         {'topicName': topicName, 'text': text})
 
 
 
@@ -47,8 +48,18 @@ class DB_Connection:
         connection = sqlite3.connect("topics_new1.db")
         connection.row_factory = dict_factory
         cursor = connection.cursor()
+        cursor.execute("""CREATE TABLE IF NOT EXISTS topics_new1 (
+                    topicName text,
+                    text text
+                    )""")
         cursor.execute("select * from topics_new1")
+
+        #first_row = next(cursor.fetchone())
+        #for row in chain((first_row,), cursor.fetchone()):
         return cursor.fetchall()
+        #return "empty table topics"
+
+
 
 # def update_text(emp, text):
 #  with conn:

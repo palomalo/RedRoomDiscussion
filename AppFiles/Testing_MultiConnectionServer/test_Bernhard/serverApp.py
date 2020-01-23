@@ -5,7 +5,6 @@
 import datetime
 import os
 import sqlite3
-import json
 from urllib.parse import urlencode
 
 import httpbin
@@ -16,8 +15,8 @@ from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 from starlette.websockets import WebSocketDisconnect
 
-from AppFiles.websocketMains.DB.Topics import Topics
-from AppFiles.websocketMains.DB.UserDB import UserDB
+from AppFiles.Testing_MultiConnectionServer.DB.Topics import Topics
+from AppFiles.Testing_MultiConnectionServer.DB.UserDB import UserDB
 
 ROOT = os.path.dirname(__file__)
 LOGS_PATH = os.path.join(ROOT, "htdocs", "logs")
@@ -88,10 +87,8 @@ def padding(request):
     return PlainTextResponse("Z" * size)
 
 
-# *** Multi connection server ***
-# Array to store socket references
-# of all established connections
 list_of_clients = []
+
 
 @app.websocket_route("/ws")
 async def ws(websocket):
@@ -99,60 +96,66 @@ async def ws(websocket):
     WebSocket echo endpoint.
     """
 
-
     if "chat" in websocket.scope["subprotocols"]:
         subprotocol = "chat"
     else:
         subprotocol = None
     await websocket.accept(subprotocol=subprotocol)
 
-    # *** Multi connection server ***
-    # add to array of socket references
     list_of_clients.append(websocket)
     print(websocket)
 
+    userDB = UserDB()
+    allUser = userDB.getAlluser()
+
     try:
         while True:
-            message = await websocket.receive_text()
-            print("Received from " + message)
-            # await websocket.send_text(message)
-            # await websocket.send(message)
 
-            #TODO: Login und Themenauswahl müssen vom Messaging
-            # gesondert behandelt werden, weil messages an alle
-            # aktive Clients weitergegeben werden.
-            #if type(message) == str:
-                #await websocket.send_json(results)
+            message = await websocket.receive_text()  # + " (server echo)" #+ entry
+            new_topic = await websocket.receive_json()
+            print(new_topic)
+            print(message)
+            print(websocket)
+            print(len(list_of_clients))
 
             for clients in list_of_clients:
-                try:
-                    await clients.send_text(message + " client")
-                    if "get topics" in message:
-                        db = Topics()
-                        results = db.getAllTopics()
-                        # await clients.send_text(websocket)
-                        await clients.send_json(results)
 
-                    if "get user" in message:
-                        userDB = UserDB()
-                        allUser = userDB.getAlluser()
-                        # await clients.send_text(websocket)
-                        await clients.send_json(allUser)
+                '''if "add topic" in message:
+                    db = Topics()
+                   # results = db.insert_topic(new_topic)
+                   # await clients.send_json(results)
+                else:
+                    await clients.send_text(message + " client")'''
 
-                    if "add topic" in message:
-                        await websocket.send_text("add topic")
-                        new_topic = await websocket.receive_json()
-                        topic_db = Topics()
-                        topic_db.insert_topic(new_topic[0], new_topic[1])
+                if "get topics" in message:
+                    db = Topics()
+                    results = db.getAllTopics()
+                    # await clients.send_text(websocket)
+                    await clients.send_json(results)
 
-                except:
-                    await clients.close()
-                    list_of_clients.remove(clients)
+                if "get user" in message:
+                    allUser = userDB.getAlluser()
+                    # await clients.send_text(websocket)
+                    await clients.send_json(allUser)
 
+                if "add topic" in message:
+                    await websocket.send_text("add topic")
+                    new_topic = await websocket.receive_json()
+                    topic_db = Topics()
+                    topic_db.insert_topic(new_topic[0], new_topic[1])
+
+                # await clients.send_text(message + "failed")
+                # await clients.send_text("get user / get topics / add topics / add user")
+
+                # except:
+                # await clients.close()
+                # list_of_clients.remove(clients)
+
+            # await websocket.send_text(message)
     except WebSocketDisconnect:
         pass
 
 
 app.mount("/httpbin", WsgiToAsgi(httpbin.app))
 
-app.mount("/", StaticFiles(directory=os.path.join(ROOT, "../htdocs"), html=True))
+app.mount("/", StaticFiles(directory=os.path.join(ROOT, "htdocs"), html=True))
