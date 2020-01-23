@@ -12,6 +12,10 @@ from collections import deque
 from typing import Callable, Deque, Dict, List, Optional, Union, cast
 from urllib.parse import urlparse
 
+from threading import Thread
+import PySimpleGUI as sg
+import time
+
 import wsproto
 import wsproto.events
 
@@ -288,6 +292,32 @@ def save_session_ticket(ticket):
             pickle.dump(ticket, fp)
 
 
+
+
+
+def threaded_GUI(ws):
+    sg.theme('DarkAmber')  # Add a touch of color
+    # All the stuff inside your window.
+    layout = [[sg.Text('Some text on Row 1')],
+              [sg.Text('Enter something on Row 2'), sg.InputText()],
+              [sg.Button('Ok'), sg.Button('Cancel')]]
+
+    # Create the Window
+    window = sg.Window('Window Title', layout)
+    # Event Loop to process "events" and get the "values" of the inputs
+    while True:
+        event, values = window.read()
+        if event in (None, 'Cancel'):  # if user closes window or clicks cancel
+            break
+        print('GUI ', values[0])
+        asyncio.run(send_message(ws, values[0]))
+
+    window.close()
+
+async def send_message(ws, message):
+    await ws.send(message)
+
+
 async def run(
     configuration: QuicConfiguration,
     url: str,
@@ -326,16 +356,74 @@ async def run(
             # send some messages and receive reply
             #while input("Type your message: ") != "exit":
 
-            while True:
-                message = stdin.readline()
-                if message == "":
-                    continue
-                else:
-                    await ws.send(message)
+            def start_loop(loop):
+                asyncio.set_event_loop(loop)
+                loop.run_forever()
 
-                messageRec = await ws.recv()
-                if messageRec != "":
+            new_loop = asyncio.new_event_loop()
+            t = Thread(target=start_loop, args=(new_loop,))
+            t.start()
+
+            new_loop2 = asyncio.new_event_loop()
+            t2 = Thread(target=start_loop, args=(new_loop2,))
+            t2.start()
+
+            def more_work(x):
+                print("More work %s" % x)
+                time.sleep(x)
+                print("Finished more work %s" % x)
+
+
+            async def read_server():
+                #ws = await client.websocket(url, subprotocols=["chat", "superchat"])
+                while True:
+                    messageRec = await ws.recv()
                     print("< " + messageRec)
+
+
+            async def read_user():
+                #ws = await client.websocket(url, subprotocols=["chat", "superchat"])
+                while True:
+                    print("listening to user")
+                    message = stdin.readline()
+                    await ws.send(message)
+                    print("I sent: "+message)
+
+            #new_loop.call_soon_threadsafe(read_server())
+            #new_loop2.call_soon_threadsafe(read_user())
+
+            #asyncio.run_coroutine_threadsafe(read_server(), new_loop)
+            asyncio.run_coroutine_threadsafe(read_user(), new_loop2)
+
+            while True:
+                messageRec = await ws.recv()
+                print("< " + messageRec)
+
+
+            #futures = [...]
+            #loop = asyncio.get_event_loop()
+            #loop.run_until_complete(asyncio.wait(futures))
+            #loop.run_forever(read_server(ws))
+            #loop.run_until_complete(read_server(ws))
+
+            #tasks = [asyncio.ensure_future(read_server(ws)),
+            #         asyncio.ensure_future(read_user(ws))]
+
+            #loop.run_until_complete(asyncio.gather(*tasks))
+
+
+            #while True:
+                #'.run(read_server(ws))
+
+                #message = stdin.readline()
+                #if message == "":
+                #    continue
+                #else:
+                #    await ws.send(message)
+
+                #messageRec = await ws.recv()
+                #if messageRec != "":
+                #    print("< " + messageRec)
                 #message = input("Type your message: ")
                 #await ws.send(message)
                 #messageRec = await ws.recv()
