@@ -295,7 +295,7 @@ def save_session_ticket(ticket):
 
 
 
-def threaded_GUI(ws):
+def threaded_GUI():
     sg.theme('DarkAmber')  # Add a touch of color
     # All the stuff inside your window.
     layout = [[sg.Text('Some text on Row 1')],
@@ -310,7 +310,7 @@ def threaded_GUI(ws):
         if event in (None, 'Cancel'):  # if user closes window or clicks cancel
             break
         print('GUI ', values[0])
-        asyncio.run(send_message(ws, values[0]))
+        #asyncio.run(send_message(ws, values[0]))
 
     window.close()
 
@@ -349,6 +349,8 @@ async def run(
 
         if parsed.scheme == "wss":
             ws = await client.websocket(url, subprotocols=["chat", "superchat"])
+
+            #threaded_GUI()
 
             #print(ws.stream_id)
 

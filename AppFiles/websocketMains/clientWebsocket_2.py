@@ -157,7 +157,7 @@ def transaction(userChat):
                 async def read_user():
                     while True:
                         message = stdin.readline()
-                        await ws.send("Client 1: " + message)
+                        await ws.send("Client 2: " + message)
 
                 asyncio.run_coroutine_threadsafe(read_user(), new_loop)
 

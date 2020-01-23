@@ -6,6 +6,7 @@ import pickle
 import select
 import ssl
 import sys
+from sys import stdin
 import signal
 import socket
 import time

@@ -87,6 +87,11 @@ def padding(request):
     return PlainTextResponse("Z" * size)
 
 
+# *** Multi connection server ***
+# Array to store socket references
+# of all established connections
+list_of_clients = []
+
 @app.websocket_route("/ws")
 async def ws(websocket):
     """
@@ -98,12 +103,12 @@ async def ws(websocket):
     #            text text
     #            )""")
 
-    db = DB_Connection()
+    #db = DB_Connection()
 
     #entry = json.dumps(db.getAllTopics())
     #print(entry)
 
-    results = db.getAllTopics()
+    #results = db.getAllTopics()
     # entry[0]
 
     if "chat" in websocket.scope["subprotocols"]:
@@ -112,13 +117,30 @@ async def ws(websocket):
         subprotocol = None
     await websocket.accept(subprotocol=subprotocol)
 
+    # *** Multi connection server ***
+    # add to array of socket references
+    list_of_clients.append(websocket)
+    print(websocket)
+
     try:
         while True:
             message = await websocket.receive_text()
+            print("Received from " + message)
             # await websocket.send_text(message)
             # await websocket.send(message)
-            if type(message) == str:
-                await websocket.send_json(results)
+
+            #TODO: Login und Themenauswahl müssen vom Messaging
+            # gesondert behandelt werden, weil messages an alle
+            # aktive Clients weitergegeben werden.
+            #if type(message) == str:
+                #await websocket.send_json(results)
+
+            for clients in list_of_clients:
+                try:
+                    await clients.send_text(message + " client")
+                except:
+                    await clients.close()
+                    list_of_clients.remove(clients)
 
     except WebSocketDisconnect:
         pass

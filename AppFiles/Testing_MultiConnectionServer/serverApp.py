@@ -115,6 +115,17 @@ async def ws(websocket):
     list_of_clients.append(websocket)
     print(websocket)
 
+    #warte uach LOGIN daten
+    # prüfe LOGIN = ? DB
+
+
+
+
+
+
+
+
+
     try:
         while True:
 
