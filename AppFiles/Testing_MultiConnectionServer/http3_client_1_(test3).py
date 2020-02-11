@@ -380,16 +380,16 @@ async def run(
                 #ws = await client.websocket(url, subprotocols=["chat", "superchat"])
                 while True:
                     messageRec = await ws.recv()
-                    print("< " + messageRec)
+                    print(messageRec)
 
 
             async def read_user():
                 #ws = await client.websocket(url, subprotocols=["chat", "superchat"])
                 while True:
-                    print("listening to user")
+                    #("listening to user")
                     message = stdin.readline()
                     await ws.send(message)
-                    print("I sent: "+message)
+                    #print("I sent: "+message)
 
             #new_loop.call_soon_threadsafe(read_server())
             #new_loop2.call_soon_threadsafe(read_user())
@@ -399,7 +399,7 @@ async def run(
 
             while True:
                 messageRec = await ws.recv()
-                print("< " + messageRec)
+                print(messageRec)
 
 
             #futures = [...]

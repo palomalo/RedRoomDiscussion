@@ -335,7 +335,7 @@ async def run(
 
                 messageRec = await ws.recv()
                 if messageRec != "":
-                    print("< " + messageRec)
+                    print(messageRec)
                 #message = input("Type your message: ")
                 #await ws.send(message)
                 #messageRec = await ws.recv()
