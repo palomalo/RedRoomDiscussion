@@ -16,7 +16,13 @@ from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 from starlette.websockets import WebSocketDisconnect
 
-from AppFiles.websocketMains.DB.DB_Connection import DB_Connection
+from AppFiles.websocketMains.DB.Topics import Topics
+from AppFiles.websocketMains.DB.UserDB import UserDB
+
+from tkinter import *
+import os
+from tkinter import messagebox
+from AppFiles.manager.db_topics import Database
 
 ROOT = os.path.dirname(__file__)
 LOGS_PATH = os.path.join(ROOT, "htdocs", "logs")
@@ -92,24 +98,87 @@ def padding(request):
 # of all established connections
 list_of_clients = []
 
+creds = 'tempfile.temp'  # This just sets the variable creds to 'tempfile.temp'
+db = Database('topics.db')
+
+
+def populate_list(parts_list):
+    parts_list.delete(0, END)
+    for row in db.fetch():
+        parts_list.insert(END, row)
+
+
+def add_item(topic_name, topic_text):
+    db.insert(topic_name, topic_text)
+    # parts_list.delete(0, END)
+    # parts_list.insert(END, (topic_name.get(), topic_text.get()))
+    # clear_text()
+    # populate_list()
+
+
+'''
+def select_item(event):
+    try:
+        global selected_item
+
+        index = parts_list.curselection()[0]
+        selected_item = parts_list.get(index)
+        chat_btn.grid()
+
+        part_entry.delete(0, END)
+        part_entry.insert(END, selected_item[1])
+        customer_entry.delete(0, END)
+        customer_entry.insert(END, selected_item[2])
+
+    except IndexError:
+        pass
+
+
+def remove_item():
+    db.remove(selected_item[0])
+    clear_text()
+    populate_list()
+
+
+def update_item():
+    db.update(selected_item[0], topic_name.get(), topic_text.get())
+    populate_list()
+
+
+def send_msg(chat_msg):
+    # print(topic_name.get())
+    print(chat_msg.get())
+
+
+def start_chat():
+    app.destroy()
+    chat = Tk()
+    chat.title(selected_item)
+    chat.geometry('700x450')
+
+    chat_msg = StringVar()
+    chat_label = Label(chat, text='chat Msg', font=('bold', 14), pady=20)
+    chat_label.grid(row=0, column=0, sticky=W)
+    chat_entry = Entry(chat, textvariable=chat_msg)
+    chat_entry.grid(row=0, column=1)
+
+    chat_btn_send = Button(chat, text='send Msg', width=12, command=lambda: send_msg(chat_msg))
+    chat_btn_send.grid(row=0, column=2, pady=20)
+
+    # Start program
+    chat.mainloop()
+
+
+def clear_text():
+    part_entry.delete(0, END)
+    customer_entry.delete(0, END)'''
+
+
 @app.websocket_route("/ws")
 async def ws(websocket):
     """
     WebSocket echo endpoint.
     """
-
-    # c.execute("""CREATE TABLE IF NOT EXISTS topics (
-    #           topicName text,
-    #            text text
-    #            )""")
-
-    #db = DB_Connection()
-
-    #entry = json.dumps(db.getAllTopics())
-    #print(entry)
-
-    #results = db.getAllTopics()
-    # entry[0]
 
     if "chat" in websocket.scope["subprotocols"]:
         subprotocol = "chat"
@@ -120,24 +189,34 @@ async def ws(websocket):
     # *** Multi connection server ***
     # add to array of socket references
     list_of_clients.append(websocket)
+    # json = websocket.receive_json()
+
     print(websocket)
 
     try:
         while True:
-            message = await websocket.receive_text()
+            message = await websocket.receive_json()
+            jsonM = json.loads(message)
             print("Received from " + message)
+            for key, value in jsonM.items():
+                print(key, value)
+
+            print(jsonM["action"])
             # await websocket.send_text(message)
             # await websocket.send(message)
 
-            #TODO: Login und Themenauswahl müssen vom Messaging
-            # gesondert behandelt werden, weil messages an alle
-            # aktive Clients weitergegeben werden.
-            #if type(message) == str:
-                #await websocket.send_json(results)
-
             for clients in list_of_clients:
                 try:
-                    await clients.send_text(message + " client")
+                    if jsonM["action"] == "add_item":
+                        # await clients.send_text("ssssssssaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+                        db.insert(jsonM["topic_name"], jsonM["topic_text"])
+                        await clients.send_text("inserted_item")
+
+                    if jsonM["action"] == "populate_list":
+                        await clients.send_text("topic list update")
+
+                    #await clients.send_text(message + " client")
+
                 except:
                     await clients.close()
                     list_of_clients.remove(clients)
@@ -145,6 +224,25 @@ async def ws(websocket):
     except WebSocketDisconnect:
         pass
 
+
+'''
+def start_chat():
+    app.destroy()
+    chat = Tk()
+    chat.title(selected_item)
+    chat.geometry('700x450')
+
+    chatMsg = StringVar()
+    chat_label = Label(chat, text='chat Msg', font=('bold', 14), pady=20)
+    chat_label.grid(row=0, column=0, sticky=W)
+    chat_entry = Entry(chat, textvariable=chatMsg)
+    chat_entry.grid(row=0, column=1)
+
+    chat_btn_send = Button(chat, text='send Msg', width=12, command=send_msg)
+    chat_btn_send.grid(row=0, column=2, pady=20)
+
+    # Start program
+    chat.mainloop()'''
 
 app.mount("/httpbin", WsgiToAsgi(httpbin.app))
 

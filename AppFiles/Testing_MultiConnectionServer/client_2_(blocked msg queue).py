@@ -3,21 +3,14 @@ import asyncio
 import json
 import logging
 import pickle
-import select
 import ssl
 import sys
-import socket
+from sys import stdin
 import time
 import os
-import threading
-import keyboard
-from sys import stdin
-import queue
-import time
 from collections import deque
 from typing import Callable, Deque, Dict, List, Optional, Union, cast
 from urllib.parse import urlparse
-from multiprocessing import Pool
 
 import wsproto
 import wsproto.events
@@ -295,39 +288,6 @@ def save_session_ticket(ticket):
             pickle.dump(ticket, fp)
 
 
-no_input = True
-
-def add_up_time():
-    print("adding up time...")
-    timeTaken=float(0)
-    while no_input:
-        time.sleep(0.01)
-        timeTaken=timeTaken+0.01
-    print(timeTaken)
-
-
-# designed to be called as a thread
-def signal_user_input(ws):
-    global no_input
-    i = input("hit enter to stop things")   # I have python 2.7, not 3.x
-    #asyncio.await ws.send(i)
-    no_input = False
-    # thread exits here
-
-
-async def write_recv_msg(ws):
-    while True:
-        message_rec = await ws.recv()
-        print("< " + message_rec)
-
-
-
-async def send_msg(ws):
-    while True:
-        message = input("Type your message: ")
-        await ws.send(message)
-
-
 async def run(
     configuration: QuicConfiguration,
     url: str,
@@ -365,104 +325,7 @@ async def run(
             #os.system('clear')
             # send some messages and receive reply
             #while input("Type your message: ") != "exit":
-            message_rec = ""
-            #while True:
-            #pool_two = Pool(processes=1)  # Start a worker processes.
-            #pool_two.apply_async(send_msg, [ws], )
 
-            #pool = Pool(processes=1)  # Start a worker processes.
-            #pool.apply_async(write_recv_msg, [ws])  # Evaluate "f(10)" asynchronously calling callback when finished.
-            #inputs = [server]
-            #outputs = []
-            #message_queues = {}
-            #while inputs:
-                # Wait for at least one of the sockets to be ready for processing
-            #    print(sys.stderr, '\nwaiting for the next event')
-            #    readable, writable, exceptional = select.select(inputs, outputs, inputs)
-            #    for s in readable:
-
-            #        if s is server:
-            #            # A "readable" server socket is ready to accept a connection
-            #            connection, client_address = s.accept()
-            #            print(sys.stderr, 'new connection from', client_address)
-            #            connection.setblocking(0)
-            #            inputs.append(connection)
-
-                        # Give the connection a queue for data we want to send
-             #           message_queues[connection] = queue.queue()
-             #       else:
-             #           data = s.recv(1024)
-             #           if data:
-             #               # A readable client socket has data
-             #               print(sys.stderr, 'received "%s" from %s' % (data, s.getpeername()))
-             #               message_queues[s].put(data)
-             #               # Add output channel for response
-             #               if s not in outputs:
-             #                   outputs.append(s)
-             #           else:
-             #               # Interpret empty result as closed connection
-             #               print >> sys.stderr, 'closing', client_address, 'after reading no data'
-             #               # Stop listening for input on the connection
-             #               if s in outputs:
-             #                   outputs.remove(s)
-             #               inputs.remove(s)
-             #               s.close()
-
-                            # Remove message queue
-             #               del message_queues[s]
-                        # Handle outputs
-             #   for s in writable:
-             #       try:
-             #           next_msg = message_queues[s].get_nowait()
-             #       except queue.empty:
-             #           # No messages waiting so stop checking for writability.
-             #           print(sys.stderr, 'output queue for', s.getpeername(), 'is empty')
-             #           outputs.remove(s)
-             #       else:
-             #           print(sys.stderr, 'sending "%s" to %s' % next_msg, s.getpeername())
-             #           s.send(next_msg)
-                # Handle "exceptional conditions"
-             #   for s in exceptional:
-             #       print(sys.stderr, 'handling exceptional condition for', s.getpeername())
-             #       # Stop listening for input on the connection
-             #       inputs.remove(s)
-             #       if s in outputs:
-             #           outputs.remove(s)
-             #       s.close()
-
-                    # Remove message queue
-             #       del message_queues[s]
-
-
-
-           # while True:
-           #     sockets_list = [sys.stdin, server]
-           #     readable, writable, exceptional = select.select(sockets_list, [], [])
-           #     for socks in readable:
-           #         if socks == server:
-           #             message = await ws.recv()
-           #             print(message)
-           #         else:
-           #             message = sys.stdin.readline()
-           #             await ws.send(message)
-           #             sys.stdout.write("<You>")
-           #             sys.stdout.write(message)
-           #             sys.stdout.flush()
-                messageRec = ""
-                message = ""
-
-                #ws.recv()
-                #message = stdin.readline()
-                #if message == "":
-                #    continue
-                #else:
-                #    await ws.send(message)
-
-                #messageRec = await ws.recv()
-                #if messageRec != "":
-                #    print("< " + messageRec)
-                # task = [print("< " + messageRec)]
-                # await asyncio.wait(task)
             while True:
                 message = stdin.readline()
                 if message == "":
@@ -470,54 +333,15 @@ async def run(
                 else:
                     await ws.send(message)
 
-                while True
-                    messageRec = await ws.recv()
-                    print("< " + messageRec)
-                    if messageDel == messageRec:
-                        break
-                    messageDel = messageRec
-
-                #if messageRec != "":
-
-
-            await ws.close()
-                #try:  # used try so that if user pressed other than the given key error will not be shown
-
-                   # if keyboard.is_pressed('q'):  # if key 'q' is pressed
-                   #     message = input('Type your message: ')
-                   #     await ws.send(message)
-                   # else:
-
-                   #     message_rec = await ws.recv()
-                   #     print("< " + message_rec)
-                        #break  # finishing the loop
-                #except:
-                    #break
-            #while True:
+                messageRec = await ws.recv()
+                if messageRec != "":
+                    print(messageRec)
                 #message = input("Type your message: ")
-                #if message != "":
-                #    await ws.send(message)
-#
-                #else:
-
-
-                # we're just going to wait for user input while adding up time once...
-                #threading.Thread(target=signal_user_input(ws)).start()
-
-                #add_up_time()
-
-
-
-
-                #message_rec = await ws.recv()
-                #print("< " + message_rec)
-
-                #print("done.... we could set no_input back to True and loop back to the previous comment...")
-
-
+                #await ws.send(message)
+                #messageRec = await ws.recv()
                 #task = [print("< " + messageRec)]
                 #await asyncio.wait(task)
-
+                #print("< " + messageRec)
                 #await ws.close()
         else:
             # perform request
