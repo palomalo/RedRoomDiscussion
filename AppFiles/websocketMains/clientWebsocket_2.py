@@ -4,40 +4,33 @@ import json
 import logging
 import pickle
 import ssl
-import sys
-from sys import stdin
+from tkinter import *
+import queue
 import time
-from collections import deque
+import threading
+import time
+from tkinter import messagebox
 from typing import Callable, Deque, Dict, List, Optional, Union, cast
 from urllib.parse import urlparse
-
-import wsproto
-import wsproto.events
-
+from tkinter import *
+import os
 from threading import Thread
 
 import aioquic
 from aioquic.asyncio.client import connect
-from aioquic.asyncio.protocol import QuicConnectionProtocol
 from aioquic.h0.connection import H0_ALPN, H0Connection
 from aioquic.h3.connection import H3_ALPN, H3Connection
 from aioquic.h3.events import (
     DataReceived,
-    H3Event,
     HeadersReceived,
-    PushPromiseReceived,
 )
 from aioquic.quic.configuration import QuicConfiguration
-from aioquic.quic.events import QuicEvent
 from aioquic.quic.logger import QuicLogger
-
-from AppFiles.websocketMains.clientClasses.URL import URL
-from AppFiles.websocketMains.clientClasses.HttpRequest import HttpRequest
-from AppFiles.websocketMains.DB.Topics import Topics
-from AppFiles.websocketMains.DB.DB_Connection import DB_Connection
 from AppFiles.websocketMains.clientClasses.HttpClient import HttpClient
-
-# opening a websocket: --print-response --ca-certs ../../Keys/pycacert.pem wss://localhost:4433/ws
+import json
+from tkinter import *
+import os
+from AppFiles.manager.db_topics import Database
 
 try:
     import uvloop
@@ -50,6 +43,9 @@ HttpConnection = Union[H0Connection, H3Connection]
 
 USER_AGENT = "aioquic/" + aioquic.__version__
 
+creds = 'tempfile.temp'  # This just sets the variable creds to 'tempfile.temp'
+db = Database('topics.db')
+
 
 # URLLL = URL("wss://localhost:4433/ws")
 
@@ -61,7 +57,7 @@ def getUserAgent():
     return USER_AGENT
 
 
-def transaction(userChat):
+def transaction(topic_name, topic_text, parts_list):
     async def perform_http_request(
             client: HttpClient, url: str, data: str, print_response: bool
     ) -> None:
@@ -142,7 +138,8 @@ def transaction(userChat):
 
             if parsed.scheme == "wss":
                 ws = await client.websocket(url, subprotocols=["chat", "superchat"])
-                print("Hint: To send a message type and press enter.")
+
+                # print("Hint: To send a message type and press enter.")
 
                 # ******************************
                 # *** ASYNCHRONOUS THREADING ***
@@ -155,9 +152,11 @@ def transaction(userChat):
                 t.start()
 
                 async def read_user():
-                    while True:
-                        message = stdin.readline()
-                        await ws.send("Client 2: " + message)
+                    # while True:
+                    message = add_item(topic_name, topic_text)
+                    # message = add_item()
+                    await ws.send(message)
+                    # CheckLogin()
 
                 asyncio.run_coroutine_threadsafe(read_user(), new_loop)
 
@@ -165,8 +164,15 @@ def transaction(userChat):
                 while True:
                     messageRec = await ws.recv()
                     print("< " + messageRec)
+                    if messageRec == "inserted_item":
+                        print("client update list")
+                        root = Tk()
+                        app = App(root)
+                        app.update_text()
+                        root.mainloop()
+
                 # *** ASYNCHRONOUS THREADING ***
-                # ******************************
+                # ******************************'''
 
                 await ws.close()
             else:
@@ -266,26 +272,223 @@ def transaction(userChat):
 
 
 def getuserinput():
-    userInput = ""
-    userinput = ""
+    if os.path.isfile(creds):
+        Login()
+    else:  # This if else statement checks to see if the file exists. If it does it will go to Login, if not it will go to Signup :)
+        Signup()
 
-    while "pw1234" not in userInput:
-        userInput = input("to start a connection type in password")
-        userInput = userInput.lower()
-        if "pw1234" not in userInput and "1234" not in userInput:
-            print("password not valid: try again or type 'exit' to close window")
-        if "exit" in userInput:
-            print("Good bye")
-    print("password correct")
-    userTopicInput = ""
-    while "get topics" and "get" not in userTopicInput:
-        userTopicInput = input("type 'get topics' to get all TOPICS or type exit")
-        userTopicInput = userTopicInput.lower()
-        if "get" in userTopicInput:
-            transaction("client sent 'get topics'")
-        if "exit" in userTopicInput:
-            boolVar = False
-            print("Good bye")
+
+def Signup():  # This is the signup definition,
+    global pwordE  # These globals just make the variables global to the entire script, meaning any definition can use them
+    global nameE
+    global roots
+
+    roots = Tk()  # This creates the window, just a blank one.
+    roots.title('Signup')  # This renames the title of said window to 'signup'
+    intruction = Label(roots,
+                       text='Please Enter new Credidentials\n')  # This puts a label, so just a piece of text saying 'please enter blah'
+    intruction.grid(row=0, column=0,
+                    sticky=E)  # This just puts it in the window, on row 0, col 0. If you want to learn more look up a tkinter tutorial :)
+
+    nameL = Label(roots,
+                  text='New Username: ')  # This just does the same as above, instead with the text new username.
+    pwordL = Label(roots, text='New Password: ')  # ^^
+    nameL.grid(row=1, column=0,
+               sticky=W)  # Same thing as the instruction var just on different rows. :) Tkinter is like that.
+    pwordL.grid(row=2, column=0, sticky=W)  # ^^
+
+    nameE = Entry(roots)  # This now puts a text box waiting for input.
+    pwordE = Entry(roots,
+                   show='*')  # Same as above, yet 'show="*"' What this does is replace the text with *, like a password box :D
+    nameE.grid(row=1, column=1)  # You know what this does now :D
+    pwordE.grid(row=2, column=1)  # ^^
+
+    signupButton = Button(roots, text='Signup',
+                          command=FSSignup)  # This creates the button with the text 'signup', when you click it, the command 'fssignup' will run. which is the def
+    signupButton.grid(columnspan=2, sticky=W)
+    roots.mainloop()  # This just makes the window keep open, we will destroy it soon
+
+
+def FSSignup():
+    with open(creds, 'w') as f:  # Creates a document using the variable we made at the top.
+        f.write(
+            nameE.get())  # nameE is the variable we were storing the input to. Tkinter makes us use .get() to get the actual string.
+        f.write('\n')  # Splits the line so both variables are on different lines.
+        f.write(pwordE.get())  # Same as nameE just with pword var
+        f.close()  # Closes the file
+
+    roots.destroy()  # This will destroy the signup window. :)
+    Login()  # This will move us onto the login definition :D
+
+
+def Login():
+    global nameEL
+    global pwordEL  # More globals :D
+    global rootA
+    global chatMsg1
+
+    rootA = Tk()  # This now makes a new window.
+    rootA.title('Login')  # This makes the window title 'login'
+    rootA.geometry('700x350')
+    intruction = Label(rootA, text='Please Login\n')  # More labels to tell us what they do
+    intruction.grid(sticky=E)  # Blahdy Blah
+
+    nameL = Label(rootA, text='Username: ')  # More labels
+    pwordL = Label(rootA, text='Password: ')  # ^
+    nameL.grid(row=1, sticky=W)
+    pwordL.grid(row=2, sticky=W)
+
+    nameEL = Entry(rootA)  # The entry input
+    pwordEL = Entry(rootA, show='*')
+    nameEL.grid(row=1, column=1)
+    pwordEL.grid(row=2, column=1)
+
+    loginB = Button(rootA, text='Login',
+                    command=CheckLogin)  # This makes the login button, which will go to the CheckLogin def.
+    loginB.grid(columnspan=2, sticky=W)
+
+    rmuser = Button(rootA, text='Delete User', fg='red',
+                    command=DelUser)  # This makes the deluser button. blah go to the deluser def.
+    rmuser.grid(columnspan=2, sticky=W)
+
+    rootA.mainloop()
+
+
+def CheckLogin():
+    with open(creds) as f:
+        data = f.readlines()  # This takes the entire document we put the info into and puts it into the data variable
+        uname = data[0].rstrip()  # Data[0], 0 is the first line, 1 is the second and so on.
+        pword = data[1].rstrip()  # Using .rstrip() will remove the \n (new line) word from before when we input it
+
+    if nameEL.get() == uname and pwordEL.get() == pword:  # Checks to see if you entered the correct data.
+
+        rootA.destroy()
+        root = Tk()
+        app = App(root)
+        root.mainloop()
+        # root.destroy()  # optional; see description below
+
+
+def bluetooth_loop(thread_queue=None, text_input=""):
+    time.sleep(15)
+    thread_queue.put(text_input)
+
+
+class App:
+    def __init__(self, master):
+
+        self.thread_queue = queue.Queue()
+        self.new_thread = threading.Thread(
+            target=bluetooth_loop)
+        frame = Frame(master)
+        frame.pack()
+        self.root = frame
+
+        '''self.quit_button = Button(frame, text="QUIT", fg="red", command=frame.quit)
+        self.quit_button.pack(side=LEFT)
+
+        self.update_btn = Button(frame, text="Update", command=self.update_text)
+        self.update_btn.pack(side=LEFT)
+        self.text_label = Label(frame)
+        self.text_label.config(text='No message')
+        self.text_label.pack(side=RIGHT)
+        self.text_input = Entry(frame, width=40)
+        self.text_input.pack(side=RIGHT)'''
+
+        # topic name
+        self.topic_name = StringVar()
+
+        self.part_label = Label(frame, text='topic Name', font=('bold', 14), pady=20)
+        self.part_label.grid(row=0, column=0, sticky=W)
+        self.part_entry = Entry(frame, textvariable=self.topic_name)
+        self.part_entry.grid(row=0, column=1)
+        # topic text
+        self.topic_text = StringVar()
+        self.customer_label = Label(frame, text='topic text', font=('bold', 14))
+        self.customer_label.grid(row=0, column=2, sticky=W)
+        self.customer_entry = Entry(frame, textvariable=self.topic_text)
+        self.customer_entry.grid(row=0, column=3)
+
+        # Parts List (Listbox)
+        self.parts_list = Listbox(frame, height=8, width=50, border=0)
+        self.parts_list.grid(row=3, column=0, columnspan=3, rowspan=6, pady=20, padx=20)
+        # Create scrollbar
+        self.scrollbar = Scrollbar(frame)
+        self.scrollbar.grid(row=3, column=3)
+        # Set scroll to listbox
+        self.parts_list.configure(yscrollcommand=self.scrollbar.set)
+        self.scrollbar.configure(command=self.parts_list.yview)
+        # Bind select
+        # parts_list.bind('<<ListboxSelect>>', select_item)
+
+        # Buttons
+        self.add_btn = Button(frame, text='Add topic', width=12, command=lambda: self.transact())
+        self.add_btn.grid(row=2, column=0, pady=20)
+
+        ''' remove_btn = Button(app, text='Remove topic', width=12, command=remove_item)
+        remove_btn.grid(row=2, column=1)
+
+        update_btn = Button(app, text='Update topic', width=12, command=update_item)
+        update_btn.grid(row=2, column=2)
+
+        clear_btn = Button(app, text='Clear topic input', width=12, command=clear_text)
+        clear_btn.grid(row=2, column=3)
+
+        chat_btn = Button(app, text='start Chat', width=12, command=start_chat)
+        chat_btn.grid(row=2, column=4)
+        chat_btn.grid_remove()'''
+
+        # frame.title('Topic Manager')
+        # frame.geometry('700x550')
+
+        # Populate data
+        self.update_text()
+        # transaction()
+        # Start program
+        # app.mainloop()
+
+    '''else:
+        r = Tk()
+        r.title('Login Failed:')
+        r.geometry('450x450')
+        rlbl = Label(r, text='\n[!] Invalid Login')
+        rlbl.pack()
+        r.mainloop()'''
+
+    def update_text(self):
+        self.parts_list.delete(0, END)
+        for row in db.fetch():
+            self.parts_list.insert(END, row)
+
+        #self.text_label.config(text='Running loop')
+        self.new_thread.start()
+        self.root.after(100, self.listen_for_result)
+
+    def listen_for_result(self):
+        '''
+        Check if there is something in the queue
+        '''
+        print("listen for result")
+        try:
+            res = self.thread_queue.get(0)
+            print(res)
+            #self.text_label.config(text=res)
+        except queue.Empty:
+            self.root.after(100, self.listen_for_result)
+
+    def transact(self):
+        transaction(self.topic_name.get(), self.topic_text.get(), self.parts_list)
+
+
+def DelUser():
+    os.remove(creds)  # Removes the file
+    rootA.destroy()  # Destroys the login window
+    Signup()  # And goes back to the start!
+
+
+def add_item(topic_name, topic_text):
+    x = '{ "action":"add_item", "topic_name": "' + topic_name + '", "topic_text":"' + topic_text + '"}'
+    return json.dumps(x)
 
 
 # Main program

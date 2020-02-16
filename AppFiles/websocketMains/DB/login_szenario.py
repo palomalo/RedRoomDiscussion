@@ -3,6 +3,10 @@ import os
 from tkinter import messagebox
 from AppFiles.manager.db_topics import Database
 
+creds = 'tempfile.temp'  # This just sets the variable creds to 'tempfile.temp'
+db = Database('topics.db')
+
+
 def Signup():  # This is the signup definition,
     global pwordE  # These globals just make the variables global to the entire script, meaning any definition can use them
     global nameE
@@ -15,7 +19,8 @@ def Signup():  # This is the signup definition,
     intruction.grid(row=0, column=0,
                     sticky=E)  # This just puts it in the window, on row 0, col 0. If you want to learn more look up a tkinter tutorial :)
 
-    nameL = Label(roots, text='New Username: ')  # This just does the same as above, instead with the text new username.
+    nameL = Label(roots,
+                  text='New Username: ')  # This just does the same as above, instead with the text new username.
     pwordL = Label(roots, text='New Password: ')  # ^^
     nameL.grid(row=1, column=0,
                sticky=W)  # Same thing as the instruction var just on different rows. :) Tkinter is like that.
@@ -49,6 +54,7 @@ def Login():
     global nameEL
     global pwordEL  # More globals :D
     global rootA
+    global chatMsg1
 
     rootA = Tk()  # This now makes a new window.
     rootA.title('Login')  # This makes the window title 'login'
@@ -119,8 +125,9 @@ def CheckLogin():
         db.update(selected_item[0], topic_name.get(), topic_text.get())
         populate_list()
 
-    def send_msg():
-        print("send send send")
+    def send_msg(chat_msg):
+        #print(topic_name.get())
+        print(chat_msg.get())
 
     def start_chat():
 
@@ -129,17 +136,19 @@ def CheckLogin():
         chat.title(selected_item)
         chat.geometry('700x450')
 
-        chatMsg = StringVar()
+        chat_msg = StringVar()
         chat_label = Label(chat, text='chat Msg', font=('bold', 14), pady=20)
         chat_label.grid(row=0, column=0, sticky=W)
-        chat_entry = Entry(chat, textvariable=chatMsg)
+        chat_entry = Entry(chat, textvariable=chat_msg)
         chat_entry.grid(row=0, column=1)
 
-        chat_btn_send = Button(chat, text='send Msg', width=12, command=send_msg)
+        chat_btn_send = Button(chat, text='send Msg', width=12, command=lambda: send_msg(chat_msg))
         chat_btn_send.grid(row=0, column=2, pady=20)
 
         # Start program
         chat.mainloop()
+
+
 
     def clear_text():
         part_entry.delete(0, END)
@@ -151,19 +160,13 @@ def CheckLogin():
         pword = data[1].rstrip()  # Using .rstrip() will remove the \n (new line) word from before when we input it
 
     if nameEL.get() == uname and pwordEL.get() == pword:  # Checks to see if you entered the correct data.
-        '''r = Tk()  # Opens new window
-        r.title(':D')
-        r.geometry('1500x350')  # Makes the window a certain size
-        rlbl = Label(r, text='\n[+] Logged In')  # "logged in" label
 
-        rlbl.pack()  # Pack is like .grid(), just different
-        rootA.destroy()
-        r.mainloop()'''
         rootA.destroy()
         app = Tk()
 
         # topic name
         topic_name = StringVar()
+
         part_label = Label(app, text='topic Name', font=('bold', 14), pady=20)
         part_label.grid(row=0, column=0, sticky=W)
         part_entry = Entry(app, textvariable=topic_name)

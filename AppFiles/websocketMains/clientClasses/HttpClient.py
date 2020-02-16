@@ -28,14 +28,14 @@ from aioquic.quic.configuration import QuicConfiguration
 from aioquic.quic.events import QuicEvent
 from aioquic.quic.logger import QuicLogger
 
-
 from AppFiles.websocketMains.clientClasses.HttpConnection import HttpConnection
 from AppFiles.websocketMains.clientClasses.WebSocket import WebSocket
 from AppFiles.websocketMains.clientClasses.HttpRequest import HttpRequest
 from AppFiles.websocketMains.clientClasses.URL import URL
 
-
 USER_AGENT = "aioquic/" + aioquic.__version__
+
+
 class HttpClient(QuicConnectionProtocol):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -132,13 +132,13 @@ class HttpClient(QuicConnectionProtocol):
         self._http.send_headers(
             stream_id=stream_id,
             headers=[
-                (b":method", request.method.encode()),
-                (b":scheme", request.url.scheme.encode()),
-                (b":authority", request.url.authority.encode()),
-                (b":path", request.url.full_path.encode()),
-                (b"user-agent", USER_AGENT.encode()),
-            ]
-            + [(k.encode(), v.encode()) for (k, v) in request.headers.items()],
+                        (b":method", request.method.encode()),
+                        (b":scheme", request.url.scheme.encode()),
+                        (b":authority", request.url.authority.encode()),
+                        (b":path", request.url.full_path.encode()),
+                        (b"user-agent", USER_AGENT.encode()),
+                    ]
+                    + [(k.encode(), v.encode()) for (k, v) in request.headers.items()],
         )
         self._http.send_data(stream_id=stream_id, data=request.content, end_stream=True)
 

@@ -26,8 +26,6 @@ class Topics:
             self.getCursor(self.getConnection()).execute("INSERT INTO topics_new1 VALUES (:topicName, :text)",
                                                          {'topicName': topicName, 'text': text})
 
-
-
     # def get_topics_new1_by_name(self, topicName):
     #   c.execute("SELECT * FROM topics_new1 WHERE topicName=:topicName", {'topicName': topicName})
     #  print(c.fetchall())
