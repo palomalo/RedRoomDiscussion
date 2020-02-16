@@ -3,26 +3,18 @@ import asyncio
 import json
 import logging
 import pickle
-import select
 import ssl
 import sys
 from sys import stdin
-import signal
-import socket
 import time
 import os
-from threading import Thread
-from time import sleep
-import keyboard
-import PySimpleGUI as sg
-import tkinter as tk
-from sys import stdin
-import queue
-import time
 from collections import deque
 from typing import Callable, Deque, Dict, List, Optional, Union, cast
 from urllib.parse import urlparse
-from multiprocessing import Pool
+
+from threading import Thread
+import PySimpleGUI as sg
+import time
 
 import wsproto
 import wsproto.events
@@ -300,47 +292,10 @@ def save_session_ticket(ticket):
             pickle.dump(ticket, fp)
 
 
-no_input = True
-
-def add_up_time():
-    print("adding up time...")
-    timeTaken=float(0)
-    while no_input:
-        time.sleep(0.01)
-        timeTaken=timeTaken+0.01
-    print(timeTaken)
 
 
-# designed to be called as a thread
-def signal_user_input(ws):
-    global no_input
-    i = input("hit enter to stop things")   # I have python 2.7, not 3.x
-    #asyncio.await ws.send(i)
-    no_input = False
-    # thread exits here
 
-
-async def write_recv_msg(ws):
-    while True:
-        message_rec = await ws.recv()
-        print("< " + message_rec)
-
-
-async def send_msg(ws):
-    while True:
-        message = input("Type your message: ")
-        await ws.send(message)
-
-
-def interrupted(signum, frame):
-    "called when read times out"
-    print ('interrupted!')
-
-
-signal.signal(signal.SIGALRM, interrupted)
-
-
-async def threaded_GUI(ws):
+def threaded_GUI():
     sg.theme('DarkAmber')  # Add a touch of color
     # All the stuff inside your window.
     layout = [[sg.Text('Some text on Row 1')],
@@ -354,20 +309,13 @@ async def threaded_GUI(ws):
         event, values = window.read()
         if event in (None, 'Cancel'):  # if user closes window or clicks cancel
             break
-        print('You entered ', values[0])
-        message = values[0]
-        await ws.send(message)
+        print('GUI ', values[0])
+        #asyncio.run(send_message(ws, values[0]))
+
     window.close()
 
-
-def input():
-    try:
-            print ('You have 5 seconds to type in your stuff...')
-            foo = stdin.readline()
-            return foo
-    except:
-            # timeout
-            return
+async def send_message(ws, message):
+    await ws.send(message)
 
 
 async def run(
@@ -401,78 +349,90 @@ async def run(
 
         if parsed.scheme == "wss":
             ws = await client.websocket(url, subprotocols=["chat", "superchat"])
-            messageDel = ''
-            messageRec= ''
-            TIMEOUT = 5
 
-            thread = await Thread(target=threaded_GUI, args=(ws, ))
-            thread.start()
-            #thread.join()
+            #threaded_GUI()
 
-            #def handler(signum, frame):
-            #    print("Forever is over!")
-            #    raise Exception("end of time")
+            #print(ws.stream_id)
+
+            #os.system('clear')
+            # send some messages and receive reply
+            #while input("Type your message: ") != "exit":
+
+            def start_loop(loop):
+                asyncio.set_event_loop(loop)
+                loop.run_forever()
+
+            new_loop = asyncio.new_event_loop()
+            t = Thread(target=start_loop, args=(new_loop,))
+            t.start()
+
+            new_loop2 = asyncio.new_event_loop()
+            t2 = Thread(target=start_loop, args=(new_loop2,))
+            t2.start()
+
+            def more_work(x):
+                print("More work %s" % x)
+                time.sleep(x)
+                print("Finished more work %s" % x)
 
 
-            #signal.signal(signal.SIGALRM, handler)
+            async def read_server():
+                #ws = await client.websocket(url, subprotocols=["chat", "superchat"])
+                while True:
+                    messageRec = await ws.recv()
+                    print(messageRec)
+
+
+            async def read_user():
+                #ws = await client.websocket(url, subprotocols=["chat", "superchat"])
+                while True:
+                    #("listening to user")
+                    message = stdin.readline()
+                    await ws.send(message)
+                    #print("I sent: "+message)
+
+            #new_loop.call_soon_threadsafe(read_server())
+            #new_loop2.call_soon_threadsafe(read_user())
+
+            #asyncio.run_coroutine_threadsafe(read_server(), new_loop)
+            asyncio.run_coroutine_threadsafe(read_user(), new_loop2)
 
             while True:
                 messageRec = await ws.recv()
-                print("< " + messageRec)
+                print(messageRec)
 
-            #   print("myTrutn")
-            #    #message = ""
-            #    # set alarm
-            #    TIMEOUT = 5
-            #    signal.alarm(TIMEOUT)
-            #    try:
-            #        message = stdin.readline()
-            #        await ws.send(message)
-            #    except Exception as e:
-            #        print(e)
-            #        if await ws.recv():
-            #            messageRec = ws.recv()
-            #            print("< " + messageRec)
-            #        continue
 
-                # disable the alarm after success
-                #signal.alarm(0)
-                #print('You typed', message)
+            #futures = [...]
+            #loop = asyncio.get_event_loop()
+            #loop.run_until_complete(asyncio.wait(futures))
+            #loop.run_forever(read_server(ws))
+            #loop.run_until_complete(read_server(ws))
+
+            #tasks = [asyncio.ensure_future(read_server(ws)),
+            #         asyncio.ensure_future(read_user(ws))]
+
+            #loop.run_until_complete(asyncio.gather(*tasks))
+
+
+            #while True:
+                #'.run(read_server(ws))
+
                 #message = stdin.readline()
                 #if message == "":
                 #    continue
                 #else:
                 #    await ws.send(message)
 
-
-
-                #while True:
-             #   print("secon")
-             #   TIMEOUT = 2
-             #   signal.alarm(TIMEOUT)
-             #   try:
-             #       messageDel = messageRec
-             #       messageRec = await ws.recv()
-             #       if messageDel != messageRec:
-             #           print("< " + messageRec)
-             #   except Exception as e:
-             #       print(e)
-             #       continue
-                        #break
-                 #   messageDel = messageRec
-                 #   messageRec = await ws.recv()
-                 #   print("< " + messageRec)
-                    #if messageDel == messageRec:
-                 #   break
-
-                    #if messageDel == messageRec:
-                    #    break
-
-
-
-
-                await ws.close()
-
+                #messageRec = await ws.recv()
+                #if messageRec != "":
+                #    print("< " + messageRec)
+                #message = input("Type your message: ")
+                #await ws.send(message)
+                #messageRec = await ws.recv()
+                #task = [print("< " + messageRec)]
+                #await asyncio.wait(task)
+                #print("< " + messageRec)
+                #await ws.close()
         else:
             # perform request
             coros = [

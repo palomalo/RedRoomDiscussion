@@ -131,13 +131,13 @@ async def ws(websocket):
 
 
             message = await websocket.receive_text() #+ " (server echo)" #+ entry
-            print(message)
-            print(len(list_of_clients))
+            print("Received: " + message)
+            #print(len(list_of_clients))
 
             for clients in list_of_clients:
                 #try:
-                print("count")
-                await clients.send_text(message + " client")
+                #print("count")
+                await clients.send_text(">" + message)
                 #except:
                     #await clients.close()
                     #list_of_clients.remove(clients)
