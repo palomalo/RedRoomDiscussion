@@ -21,7 +21,7 @@ $ pip install aioquic
 ## Use Case, Design and Project Progress
 The use case, desing and step by step project progress are documented in [ProjectProgressDocs](https://github.com/palomalo/RedRoomDiscussion/tree/dev/ProjectProgressDocs)
 
-##Testing the Websocket Handling and Simultaneous Messaging 
+## Testing the Websocket Handling and Simultaneous Messaging 
 You can test the messaging system by running multi-connection server test- app:
 ```
 $ python AppFiles/Testing_MultiConnectionServer/server_(multi-connect).py --certificate Keys/ssl_cert.pem --private-key Keys/ssl_key.pem
