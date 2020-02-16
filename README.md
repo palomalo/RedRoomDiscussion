@@ -34,7 +34,17 @@ and finally running a faulty client with a blocked message queue for demostratio
 ```
 $ python AppFiles/Testing_MultiConnectionServer/client_2_(blocked msg queue).py --print-response --ca-certs Keys/pycacert.pem wss://localhost:4433/ws
 ``` 
+## Testing Connection via asynchronous GUI 
+You can run a client - Server chat by running a GUI
 
+First starting the server:
+```
+$ python AppFiles/websocketMains/server_Websocket.py --certificate ../../Keys/ssl_cert.pem --private-key ../../Keys/ssl_key.pem
+``` 
+second running a client with the executable GUI:
+```
+$ python AppFiles/websocketMains/clientWebsocket_2.py --ca-certs ../../Keys/pycacert.pem wss://localhost:4433/ws
+``` 
 
 ## Licence
 All rights reserved
